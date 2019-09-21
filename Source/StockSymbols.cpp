@@ -1,4 +1,4 @@
-#define CURL_STATICLIB 
+//#define CURL_STATICLIB 
 #include <curl/curl.h>
 #include <iostream>
 #include <algorithm>
@@ -38,10 +38,10 @@ void fetchStockSymbols(std::string* readBuffer)
 	if(curl) 
     {
 	  	readBuffer->clear();
-	    curl_easy_setopt(curl, CURLOPT_URL, "ftp://ftp.nasdaqtrader.com/symboldirectory/nasdaqlisted.txt"); // Set URL to be used in HTTP request (list of NASDAQ stocks)
-	    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeSymbolsCallback);								// Set writeSymbolsCallback as ptr to callback function
-	    curl_easy_setopt(curl, CURLOPT_WRITEDATA, readBuffer);												// Set readBuffer as ptr to where delivered data will be written
-	    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);												// Disable curl verifying the authenticity of a peer's SSL certificate
+	    curl_easy_setopt(curl, CURLOPT_URL, "ftp://ftp.nasdaqtrader.com/symboldirectory/nasdaqlisted.txt");   // Set URL to be used in HTTP request (list of NASDAQ stocks)
+	    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeSymbolsCallback);								  // Set writeSymbolsCallback as ptr to callback function
+	    curl_easy_setopt(curl, CURLOPT_WRITEDATA, readBuffer);												  // Set readBuffer as ptr to where delivered data will be written
+	    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);												  // Disable curl verifying the authenticity of a peer's SSL certificate
 	    res = curl_easy_perform(curl);
 	    if(res != CURLE_OK)
 	    	std::cerr << curl_easy_strerror(res);
@@ -77,7 +77,7 @@ void createSymbolList(std::vector<std::string>* stockSymbols)
 	
 	while(it != end)									// Loops through readBuffer until end is reached
 	{
-		std::string symbol(it, find(it, end, '|'));			// Parses line for stock symbol
+		std::string symbol(it, find(it, end, '|'));		// Parses line for stock symbol
 		if(checkValidSymbol(symbol))					// Checks if symbol is valid, and if so, pushes it onto the vector stockSymbols
 			stockSymbols->push_back(symbol);
 		it = find(it, end, '\n') + 1;

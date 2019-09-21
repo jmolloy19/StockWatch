@@ -1,7 +1,6 @@
 #pragma once
 #include <string>
 
-
 /**
  * For World Trading API
  * Documention: https://www.worldtradingdata.com/documentation#full-history
