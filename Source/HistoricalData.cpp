@@ -1,22 +1,24 @@
 #define CURL_STATICLIB 
-#include "C:\Users\Joseph\Documents\Stock Program\curl-7.60.0-win64-mingw\include\curl\curl.h"
-#include "RetrieveHistoricalData.h"
-using namespace std;
+#include <curl/curl.h>
+#include <iostream>
+#include <StockWatch/HistoricalData.hpp>
+#include <StockWatch/Api.hpp>
+
 
 /******************************************************************************************************/
 // This function is the callback function that gets called by libcurl as soon as there is data received 
 // that needs to be saved. *contents points to the delivered data, nmemb is the size of the delievered data,
 // size is always 1, and *userp points to where the delivered data will be written. 
 /*****************************************************************************************************/
-static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *userp)
+static size_t writeDataCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {	
 	try
 	{
-		((string*)userp)->append((char*)contents, size * nmemb);
+		((std::string*)userp)->append((char*)contents, size * nmemb);
 	}
-	catch (bad_alloc &err)
+	catch (std::bad_alloc& err)
 	{
-		cerr << "Memory allocation failed. Error: " << err.what();
+		std::cerr << "Memory allocation failed. Error: " << err.what();
 		return 0;
 	}
     return size * nmemb;
@@ -27,32 +29,30 @@ static size_t WriteCallback(void *contents, size_t size, size_t nmemb, void *use
 // containing historical data of the stock specified by the symbol. It then writes this data into a string called 
 // readBuffer and returns readBuffer
 /*****************************************************************************************************/
-string fetchHistoricalData(string symbol)
+void fetchHistoricalData(const std::string& symbol, std::string* readBuffer)
 {
 	CURL *curl;
 	CURLcode res;
-	string readBuffer;
-	string URL_combined = "https://api.iextrading.com/1.0/stock/" + symbol + "/chart/1y"; 
-	//string URL_combined = "https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=" + symbol + "&outputsize=compact&apikey=UHH9Y94E4GYZ0W2W&datatype=csv";
 	
+	std::string urlCombined =  urlBase + symbol + sort + apiKey + output + startDate;
+
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
 	if(curl) 
 	{
-		readBuffer.clear();
-		curl_easy_setopt(curl, CURLOPT_URL, URL_combined.c_str());      // Set URL to be used in HTTP request (URL_combined must first be converted to a C string)
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteCallback);	// Set WriteCallback as ptr to callback function
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &readBuffer);			// Set &readBuffer as ptr to where delivered data will be written
-		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, FALSE);			// Disable curl verifying the authenticity of a peer's SSL certificate
+		readBuffer->clear();
+		curl_easy_setopt(curl, CURLOPT_URL, urlCombined.c_str());      		// Set URL to be used in HTTP request (must first be converted to a C string)
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeDataCallback);	// Set WriteCallback as ptr to callback function
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, readBuffer);				// Set &readBuffer as ptr to where delivered data will be written
+		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);				// Disable curl verifying the authenticity of a peer's SSL certificate
 		res = curl_easy_perform(curl);
 		if(res != CURLE_OK)
-			cerr << curl_easy_strerror(res);
+			std::cerr << curl_easy_strerror(res);
 		else
 		{
 			curl_easy_cleanup(curl);
 			curl_global_cleanup();
 		}
 	}
-	return readBuffer;
 }
 

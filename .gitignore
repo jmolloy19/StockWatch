@@ -1,8 +1,3 @@
-*.win 
-*.h.gch
-*.o
-curl-7.60.0-win64-mingw
-openssl-master
-.vs
-STMP.cpp
-Stock Project.*
+[Bb]uild
+.vscode
+OldApis.txt
