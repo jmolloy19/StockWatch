@@ -10,6 +10,7 @@ set(STOCKWATCH_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Include)
 
 add_executable(StockWatch
     ${SOURCE_DIR}/main.cpp
+    ${SOURCE_DIR}/StockWatch.cpp
     ${SOURCE_DIR}/Stock.cpp
     ${SOURCE_DIR}/HistoricalData.cpp
     ${SOURCE_DIR}/StockSymbols.cpp

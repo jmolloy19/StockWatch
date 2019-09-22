@@ -66,10 +66,10 @@ int Stock::getNumDays() const
  * This function returns true if a stock exhibits the high and tight flag pattern.
  * Otherwise it returns false
  */
-void Stock::checkForHTF()
+bool Stock::checkForHTF()
 {
 	if( !gotValidData_ || numDays_ < 60 )													
-		return;
+		return false;
 		
 	std::vector<double>::iterator it,
 							      mostRecent = closes_.begin(),
@@ -77,19 +77,19 @@ void Stock::checkForHTF()
 							      lowest = min_element(mostRecent , mostRecent + 60);
 	
 	if(*lowest == 0.0)
-		return;
+		return false;
 	else if (*highest / *lowest < 2.0)
-		return;
+		return false;
 	else if(highest > lowest)			
-		return;
+		return false;
 	else if( std::distance(mostRecent, highest) > 15 )
-		return;
+		return false;
 	else
 		for(it = mostRecent; it <= mostRecent + 15; it++)
 			if( *it < (*highest * .8) )
-				return;
+				return false;
 			
-	std::cout << name_ << '\n';
+	return true;
 }
 
 /**

@@ -9,7 +9,7 @@ class Stock
 		Stock() = delete;
         Stock(const std::string& symbol);
 		int getNumDays() const;
-		void checkForHTF();
+		bool checkForHTF();
 		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
 	private:
 		void inputData(const std::string& historicalData);

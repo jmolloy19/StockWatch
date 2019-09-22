@@ -10,16 +10,23 @@ int main(int argc, char* argv[])
 
     std::cout << "Stock Ticker Symbols Extracted. Total # of Stocks to Analyze: " << symbols.size() << "\n"
 		      << "Analyzing Stocks for Patterns..." << "\n\n";
-
-    for(int i = 0; i < symbols.size(); i++)
+    
+    int count = symbols.size();
+    int i = 0;
+    std::vector<std::thread> threads;
+    threads.reserve(count);
+    while(i < count)
     {
-        Stock stock(symbols[i]);
-
-        std::thread analysis(&Stock::checkForHTF, &stock);
-        std::this_thread::sleep_for(std::chrono::seconds(10));
-        if (i % 100 == 0 && i != 0)
-            std::cout << i << " Stocks Done\n";
-        analysis.join();
+        for(int j = 0; j < 10; j++, i++)
+        {
+            threads.emplace_back(analyze, std::ref(symbols[i]));    
+        }
+        for(int j = 10; j > 0; j--)
+        {
+            threads[i - j].join();
+        }
+        if(i % 100 == 0)
+            std::cout << i << "Stocks Done";
     }
     
 }
