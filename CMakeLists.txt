@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-std=c++14")
 project(StockWatch)
 
-find_package(CURL REQUIRED)
+#find_package(CURL REQUIRED)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 set(STOCKWATCH_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Include)
 

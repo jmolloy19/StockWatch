@@ -38,7 +38,7 @@ void Stock::inputData(const std::string& historicalData)
 			{
 				numDays_++;							    
 				it = begin + found + 1; 					      // Sets it to position of start of close value
-				std::string closeStr(it, find(it, end, ','));	  // Extract close value
+				std::string closeStr(it, std::find(it, end, ','));	  // Extract close value
 				closes_.push_back(std::stod(closeStr));
 
                 for(int i = 0; i < 3; i++)                        // This loop sets found to position of comma before volume value
@@ -46,9 +46,9 @@ void Stock::inputData(const std::string& historicalData)
                     found = historicalData.find(',', found + 1);  
                 }                  
                 it = begin + found + 1; 					      // Sets it to position of start of volume value
-				std::string volumeStr(it, find(it, end, '\n'));	  // Extract volume value
+				std::string volumeStr(it, std::find(it, end, '\n'));	  // Extract volume value
 				volumes_.push_back(std::stoi(volumeStr));
-                it = find(it, end, ',');
+                it = std::find(it, end, ',');
 			}
 		}
 	}
