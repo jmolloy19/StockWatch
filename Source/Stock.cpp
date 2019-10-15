@@ -55,18 +55,10 @@ void Stock::inputData(const std::string& historicalData)
 }
 
 /**
- * This function returns the number of trading days of data saved to object
- */
-int Stock::getNumDays() const
-{
-	return numDays_;
-}
-
-/**
  * This function returns true if a stock exhibits the high and tight flag pattern.
  * Otherwise it returns false
  */
-bool Stock::checkForHTF()
+bool Stock::exhibitsHTF()
 {
 	if( !gotValidData_ || numDays_ < 60 )													
 		return false;

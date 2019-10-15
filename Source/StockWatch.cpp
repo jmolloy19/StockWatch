@@ -1,9 +1,8 @@
 #include <StockWatch/StockWatch.hpp>
-#include <iostream>
 
 void analyze(const std::string& symbol)
 {
     Stock stock(symbol);
-    if(stock.checkForHTF())
+    if(stock.exhibitsHTF())
         std::cout << symbol << "\n";
 }

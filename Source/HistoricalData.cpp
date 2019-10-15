@@ -1,4 +1,3 @@
-//#define CURL_STATICLIB 
 #include <curl/curl.h>
 #include <iostream>
 #include <StockWatch/HistoricalData.hpp>

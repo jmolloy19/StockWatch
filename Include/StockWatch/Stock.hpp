@@ -8,9 +8,9 @@ class Stock
 {
 	public:
 		Stock() = delete;
+		Stock(const Stock& s) = delete;
         Stock(const std::string& symbol);
-		int getNumDays() const;
-		bool checkForHTF();
+		bool exhibitsHTF();
 		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
 	private:
 		void inputData(const std::string& historicalData);
