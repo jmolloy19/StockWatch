@@ -4,7 +4,10 @@
 /**
  * Constructor for Stock class 
  */
-Stock::Stock(const std::string& symbol) : name_(symbol), gotValidData_(false), numDays_(0)
+Stock::Stock(const std::string& symbol) : 
+	name_(symbol), 
+	gotValidData_(false), 
+	numDays_(0)
 {
     std::string historicalData;
     fetchHistoricalData(symbol, &historicalData);
@@ -38,7 +41,7 @@ void Stock::inputData(const std::string& historicalData)
 			{
 				numDays_++;							    
 				it = begin + found + 1; 					      // Sets it to position of start of close value
-				std::string closeStr(it, std::find(it, end, ','));	  // Extract close value
+				std::string closeStr(it, std::find(it, end, ','));	  	  // Extract close value
 				closes_.push_back(std::stod(closeStr));
 
                 for(int i = 0; i < 3; i++)                        // This loop sets found to position of comma before volume value
@@ -55,18 +58,19 @@ void Stock::inputData(const std::string& historicalData)
 }
 
 /**
- * This function returns the number of trading days of data saved to object
+ * This function checks if the stock exhibits certain patterns and prints them if they do
  */
-int Stock::getNumDays() const
+void Stock::analyze()
 {
-	return numDays_;
+    if(exibitsHTF())
+        std::cout << name_ << "\n";
 }
 
 /**
  * This function returns true if a stock exhibits the high and tight flag pattern.
  * Otherwise it returns false
  */
-bool Stock::checkForHTF()
+bool Stock::exibitsHTF()
 {
 	if( !gotValidData_ || numDays_ < 60 )													
 		return false;

@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     {
         for(int j = 0; j < 10; j++, i++)
         {
-            threads.emplace_back(analyze, std::ref(symbols[i]));    
+            threads.emplace_back(&Stock::analyze, Stock(symbols[i]));    
         }
         for(int j = 10; j > 0; j--)
         {

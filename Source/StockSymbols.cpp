@@ -78,7 +78,7 @@ void createSymbolList(std::vector<std::string>* stockSymbols)
 	while(it != end)									// Loops through readBuffer until end is reached
 	{
 		std::string symbol(it, find(it, end, '|'));		// Parses line for stock symbol
-		if(checkValidSymbol(symbol))					// Checks if symbol is valid, and if so, pushes it onto the vector stockSymbols
+		if(isValidSymbol(symbol))						// Checks if symbol is valid, and if so, pushes it onto the vector stockSymbols
 			stockSymbols->push_back(symbol);
 		it = find(it, end, '\n') + 1;
 	}
@@ -87,7 +87,7 @@ void createSymbolList(std::vector<std::string>* stockSymbols)
 /**
  * This function takes as input a string and verifies whether the string is a valid stock symbol
  */
-bool checkValidSymbol(const std::string& symbol)
+bool isValidSymbol(const std::string& symbol)
 {
 	if(symbol.size() > 5)									// Any symbol greater than 5 characters is probably not a valid stock symbol
 		return false;
