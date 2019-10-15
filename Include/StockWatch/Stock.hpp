@@ -8,6 +8,7 @@ class Stock
 {
 	public:
 		Stock() = delete;
+		Stock(const Stock& s) = delete;
         Stock(const std::string& symbol);
 		void analyze();
 		bool exibitsHTF();
