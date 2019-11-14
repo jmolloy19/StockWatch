@@ -10,10 +10,10 @@ class Stock
 		Stock() = delete;
 		Stock(const Stock& s) = delete;
         Stock(const std::string& symbol);
+		void inputData();
 		bool exhibitsHTF();
 		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
 	private:
-		void inputData(const std::string& historicalData);
 		std::vector<double> closes_;
 		std::vector<int> volumes_;
         std::string name_;

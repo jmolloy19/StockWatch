@@ -4,20 +4,22 @@
 /**
  * Constructor for Stock class 
  */
-Stock::Stock(const std::string& symbol) : name_(symbol), gotValidData_(false), numDays_(0)
-{
-    std::string historicalData;
-    fetchHistoricalData(symbol, &historicalData);
-    inputData(historicalData);
-}
+Stock::Stock(const std::string& symbol) : 
+	name_(symbol), 
+	gotValidData_(false), 
+	numDays_(0)
+{}
 
 /**
  * This function takes as input the string returned by fetchHistoricalData(). It parses the string for 
  * the closing prices and daily volumes of each trading day and inputs the data into the calling Stock object. 
  * Data is pushed in the order of most recent trading day first to oldest trading day last
  */
-void Stock::inputData(const std::string& historicalData)
+void Stock::inputData()
 {
+	std::string historicalData;
+    fetchHistoricalData(name_, &historicalData);
+
     std::string csvHeader = "Date,Open,Close,High,Low,Volume";
 
 	if(historicalData.find(csvHeader) != -1) 		              // If string does not contain the header string, the HTTP request was most likely invalid	
@@ -89,6 +91,7 @@ bool Stock::exhibitsHTF()
  */ 
 std::ostream& operator << (std::ostream& out, const Stock& stock)
 {
+	out << "Stock = " << stock.name_ << "\n";
 	out << "#\tCloses\tVolume\n";
 	for(int i = 0; i < stock.numDays_; i++)
 		out << i << "\t" << stock.closes_[i] << "\t" << stock.volumes_[i] << "\n";

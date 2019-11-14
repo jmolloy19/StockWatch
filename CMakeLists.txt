@@ -8,12 +8,11 @@ project(StockWatch)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 set(STOCKWATCH_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Include)
 
-add_executable(StockWatch
-    ${SOURCE_DIR}/main.cpp
-    ${SOURCE_DIR}/StockWatch.cpp
+add_library(StockWatch STATIC
     ${SOURCE_DIR}/Stock.cpp
     ${SOURCE_DIR}/HistoricalData.cpp
     ${SOURCE_DIR}/StockSymbols.cpp
+    ${SOURCE_DIR}/Analyze.cpp
 )
 
 target_link_libraries(StockWatch PUBLIC
@@ -25,3 +24,13 @@ target_include_directories(StockWatch PUBLIC
     ${STOCKWATCH_INC_DIR}
     ${CURL_INCLUDE_DIR}
 )
+
+add_executable(Analyze
+    ${SOURCE_DIR}/main.cpp
+)
+
+target_link_libraries(Analyze
+    StockWatch
+)
+
+add_subdirectory(Test)
