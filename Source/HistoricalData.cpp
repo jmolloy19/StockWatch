@@ -41,7 +41,7 @@ void fetchHistoricalData(const std::string& symbol, std::string* readBuffer)
 	{
 		readBuffer->clear();
 		curl_easy_setopt(curl, CURLOPT_URL, urlCombined.c_str());      		// Set URL to be used in HTTP request (must first be converted to a C string)
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeDataCallback);	// Set WriteCallback as ptr to callback function
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeDataCallback);	// Set writeDataCallback as ptr to callback function
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, readBuffer);				// Set &readBuffer as ptr to where delivered data will be written
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);				// Disable curl verifying the authenticity of a peer's SSL certificate
 		res = curl_easy_perform(curl);

@@ -9,12 +9,14 @@ class Stock
 	public:
 		Stock() = delete;
 		Stock(const Stock& s) = delete;
+		Stock& operator=(const Stock &) = delete;
         Stock(const std::string& symbol);
+		Stock(Stock &&) = default;
 		void analyze();
-		bool exibitsHTF();
 		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
 	private:
-		void inputData(const std::string& historicalData);
+		void inputData();
+		bool exhibitsHTF();
 		std::vector<double> closes_;
 		std::vector<int> volumes_;
         std::string name_;
