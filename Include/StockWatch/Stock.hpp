@@ -9,6 +9,8 @@ class Stock
 	public:
 		Stock() = delete;
 		Stock(const Stock& s) = delete;
+		Stock& operator=(const Stock&) = delete;
+		Stock(Stock&&) = default;
         Stock(const std::string& symbol);
 		void inputData();
 		bool exhibitsHTF();
