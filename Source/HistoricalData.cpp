@@ -1,8 +1,4 @@
-#include <curl/curl.h>
-#include <iostream>
 #include <StockWatch/HistoricalData.hpp>
-#include <StockWatch/Api.hpp>
-
 
 /**
  * This function is the callback function that gets called by libcurl as soon as there is data received 

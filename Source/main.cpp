@@ -1,25 +1,27 @@
 #include <StockWatch/StockWatch.hpp>
+#include <Utility/Utility.hpp>
 #include <iostream>
 #include <thread>
-#include <chrono>
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> symbols;
-    createSymbolList(&symbols);
-
-    std::cout << "Stock Ticker Symbols Extracted. Total # of Stocks to Analyze: " << symbols.size() << "\n"
-		      << "Analyzing Stocks for Patterns..." << "\n\n";
-    
-    int numStocks = symbols.size();
-    int i = 0;
     std::vector<std::thread> threads;
     std::vector<Stock> stocks;
-    threads.reserve(10);
-    stocks.reserve(10);
+    std::vector<std::string> symbols;
+    bool options[MAX_OPTIONS] = {false};
+
+    threads.reserve(THREAD_COUNT);
+    stocks.reserve(THREAD_COUNT);
+
+    checkCmdLineOptions(argc, argv, options);
+
+    createSymbolList(&symbols, options[0]);
+
+    int numStocks = symbols.size();
+    int i = 0;
     while(i < numStocks)
     {
-        for(int thr = 0; thr < 10 && i < numStocks; thr++, i++)
+        for(int thr = 0; thr < THREAD_COUNT && i < numStocks; thr++, i++)
         {
             stocks.emplace_back(symbols[i]);
             threads.emplace_back(&Stock::analyze, std::ref(stocks[thr]));    
