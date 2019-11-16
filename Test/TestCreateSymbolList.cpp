@@ -4,7 +4,7 @@
 int main(int argc, char* argv[])
 {
     std::vector<std::string> symbols;
-    createSymbolList(&symbols);
+    createSymbolList(&symbols, true);
 
     std::cout << "# of symbols aquired: " << symbols.size() << "\n"; 
     for(int i = 0; i < symbols.size(); i++)

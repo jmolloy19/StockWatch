@@ -1,4 +1,4 @@
-#include <Utility/CmdLineOpt.hpp>
+#include <Utility/CmdLineOptions.hpp>
 
 void checkCmdLineOptions(int argc, char* argv[], bool* options)
 {
@@ -26,7 +26,7 @@ void checkCmdLineOptions(int argc, char* argv[], bool* options)
                 std::cout << "Invalid Option: \'" << argv[i] << "\'\n\n";
             }
             displayManual();
-            exit(1);
+            exit(-1);
         }   
     }
 }

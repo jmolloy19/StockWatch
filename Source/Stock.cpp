@@ -1,5 +1,4 @@
 #include <StockWatch/Stock.hpp>
-#include <StockWatch/HistoricalData.hpp>
 
 /**
  * Constructor for Stock class 
@@ -15,11 +14,24 @@ Stock::Stock(const std::string& symbol) :
  * the closing prices and daily volumes of each trading day and inputs the data into the calling Stock object. 
  * Data is pushed in the order of most recent trading day first to oldest trading day last
  */
-void Stock::inputData()
+void Stock::inputData(bool write, bool read)
 {
 	std::string historicalData;
-    fetchHistoricalData(name_, &historicalData);
 
+	if(write)
+	{
+		writeToFile(name_ + ".csv", historicalData);	
+	}
+
+	if(read)
+	{
+		readFromFile(name_ + ".csv", &historicalData);	
+	}
+	else
+	{	
+    	fetchHistoricalData(name_, &historicalData);
+	}
+	
     std::string csvHeader = "Date,Open,Close,High,Low,Volume";
 
 	if(historicalData.find(csvHeader) != -1) 		              // If string does not contain the header string, the HTTP request was most likely invalid	
@@ -59,9 +71,9 @@ void Stock::inputData()
 /**
  * This function checks if the stock exhibits certain patterns and prints them if they do
  */
-void Stock::analyze()
+void Stock::analyze(bool write, bool read)
 {
-	inputData();
+	inputData(write, read);
     if(exhibitsHTF())
         std::cout << name_ << "\n";
 }

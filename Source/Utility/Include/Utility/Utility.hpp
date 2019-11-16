@@ -1,3 +1,3 @@
 #pragma once
-#include <Utility/CmdLineOpt.hpp>
+#include <Utility/CmdLineOptions.hpp>
 #include <Utility/WriteReadFile.hpp>

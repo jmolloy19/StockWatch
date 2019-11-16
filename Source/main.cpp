@@ -1,7 +1,5 @@
 #include <StockWatch/StockWatch.hpp>
 #include <Utility/Utility.hpp>
-#include <iostream>
-#include <thread>
 
 int main(int argc, char* argv[])
 {
@@ -24,7 +22,7 @@ int main(int argc, char* argv[])
         for(int thr = 0; thr < THREAD_COUNT && i < numStocks; thr++, i++)
         {
             stocks.emplace_back(symbols[i]);
-            threads.emplace_back(&Stock::analyze, std::ref(stocks[thr]));    
+            threads.emplace_back(&Stock::analyze, std::ref(stocks[thr]), std::ref(options[1]), std::ref(options[2]));    
         }
         for(int thr = 0; thr < threads.size(); thr++)
         {
