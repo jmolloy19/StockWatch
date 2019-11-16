@@ -71,6 +71,7 @@ void readFromFile(const std::string& filename, std::string* readBuffer)
     if(infile.is_open())
     {
         std::ifstream::pos_type fileSize = infile.tellg();
+        readBuffer->reserve(fileSize);
         infile.seekg(0, std::ios::beg);
         infile.read(&(*readBuffer)[0], fileSize);
     }

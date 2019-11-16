@@ -14,14 +14,9 @@ Stock::Stock(const std::string& symbol) :
  * the closing prices and daily volumes of each trading day and inputs the data into the calling Stock object. 
  * Data is pushed in the order of most recent trading day first to oldest trading day last
  */
-void Stock::inputData(bool write, bool read)
+void Stock::inputData(bool read, bool write)
 {
 	std::string historicalData;
-
-	if(write)
-	{
-		writeToFile(name_ + ".csv", historicalData);	
-	}
 
 	if(read)
 	{
@@ -30,6 +25,11 @@ void Stock::inputData(bool write, bool read)
 	else
 	{	
     	fetchHistoricalData(name_, &historicalData);
+	}
+
+	if(write)
+	{
+		writeToFile(name_ + ".csv", historicalData);	
 	}
 	
     std::string csvHeader = "Date,Open,Close,High,Low,Volume";
@@ -71,9 +71,9 @@ void Stock::inputData(bool write, bool read)
 /**
  * This function checks if the stock exhibits certain patterns and prints them if they do
  */
-void Stock::analyze(bool write, bool read)
+void Stock::analyze(bool read, bool write)
 {
-	inputData(write, read);
+	inputData(read, write);
     if(exhibitsHTF())
         std::cout << name_ << "\n";
 }

@@ -9,12 +9,12 @@ void checkCmdLineOptions(int argc, char* argv[], bool* options)
             *(options) = true;
             continue;
         }
-        else if(strcmp(argv[i], "--write-file") == 0)
+        else if(strcmp(argv[i], "--read-file") == 0)
         {
             *(options + 1) = true;
             continue;
         }
-        else if(strcmp(argv[i], "--read-file") == 0)
+        else if(strcmp(argv[i], "--write-file") == 0)
         {
             *(options + 2) = true;
             continue;
