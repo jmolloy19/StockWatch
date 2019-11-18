@@ -54,5 +54,6 @@ __Linux/MacOS__
 ./Build/Analyze -nw
 ```
 
-(The two examples above are equivalent)
+The two examples above are equivalent.
+
 (For Windows, you would replace the '/'s with '\\'s)
