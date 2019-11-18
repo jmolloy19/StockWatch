@@ -41,7 +41,7 @@ __Linux/MacOS__
                     Files are stored in directory ./DataFiles (which will be created
                     if it doesn't exist already).
 
--r, --read-file     Reads historical data from files from .csv files instead of making API calls. 
+-r, --read-file     Reads historical data from .csv files instead of making API calls. 
                     Can only use this option if previously ran with '--write-file' option.
 ```
 ### Usage Examples
@@ -54,5 +54,5 @@ __Linux/MacOS__
 ./Build/Analyze -nw
 ```
 
-The two examples above are equivalent.
-(For Windows, you would replace the '/'s with '\\'s)
+The two examples above are equivalent
+(and for Windows, you would replace the '/'s with '\\'s).
