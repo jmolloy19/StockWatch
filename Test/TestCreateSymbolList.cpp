@@ -3,12 +3,19 @@
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> symbols;
-    createSymbolList(&symbols, true);
+    std::vector<std::string> symbols, nasdaq, nasdaqAndNyse;
 
-    std::cout << "# of symbols aquired: " << symbols.size() << "\n"; 
+    createSymbolList(&symbols, false);
     for(int i = 0; i < symbols.size(); i++)
     {
         std::cout << symbols[i] << "\n";
     }
+
+    symbols.clear();
+    std::cout << "\nNASDAQ + NYSE:\n";
+    createSymbolList(&symbols, true);
+
+    symbols.clear();
+    std::cout << "NASDAQ:\n";
+    createSymbolList(&nasdaq, false);
 }

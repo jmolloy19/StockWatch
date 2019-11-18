@@ -1,55 +1,120 @@
 #include <Utility/CmdLineOptions.hpp>
 
+/**
+ * Function to parse command line arguments for options.
+ * @param argc    command line argument count
+ * @param argv[]  array of command line arguments
+ * @param options pointer to array specifying given command line options
+ */
 void checkCmdLineOptions(int argc, char* argv[], bool* options)
 {
-    for(int i = 1; i < argc; i++)
+    bool invalid = false;
+    int invalidIdx;
+    bool help = false;
+
+    for(int i = 1; i < argc && !help && !invalid; i++)
     {
-        if(strcmp(argv[i], "--nyse") == 0)
+        if(strlen(argv[i]) < 2)
         {
-            *(options) = true;
-            continue;
+            invalid = true;
+            invalidIdx = i;
+            break;
         }
-        else if(strcmp(argv[i], "--read-file") == 0)
+
+        if(strncmp(argv[i], "-", 1) == 0 && strncmp(argv[i], "--", 2) != 0)
         {
-            *(options + 1) = true;
-            continue;
-        }
-        else if(strcmp(argv[i], "--write-file") == 0)
-        {
-            *(options + 2) = true;
-            continue;
+            for(size_t c = 1; c < strlen(argv[i]); c++)
+            {
+                if(argv[i][c] == 'n')
+                {
+                    *(options) = true;
+                    continue;
+                }
+                else if(argv[i][c] == 'r')
+                {
+                    *(options + 1) = true;
+                    continue;
+                }
+                else if(argv[i][c] == 'w')
+                {
+                    *(options + 1) = true;
+                    continue;
+                }
+                else if(argv[i][c] == 'h')
+                {
+                    help = true;
+                    break;
+                }
+                else
+                {
+                    invalid = true;
+                    invalidIdx = i;
+                    break;
+                }  
+            }
         }
         else
         {
-            if(strcmp(argv[i], "-h") != 0 && strcmp(argv[i], "-h") != 0)
+            if(strcmp(argv[i], "--nyse") == 0)
             {
-                std::cout << "Invalid Option: \'" << argv[i] << "\'\n\n";
+                *(options) = true;
+                continue;
             }
-            displayManual();
-            exit(-1);
+            else if(strcmp(argv[i], "--read-file") == 0)
+            {
+                *(options + 1) = true;
+                continue;
+            }
+            else if(strcmp(argv[i], "--write-file") == 0)
+            {
+                *(options + 2) = true;
+                continue;
+            }
+            else if(strcmp(argv[i], "--help") == 0)
+            {
+                help = true;      
+            }
+            else
+            {
+                invalid = true;
+                invalidIdx = i;
+            }  
         }   
+    }
+
+    if(invalid)
+    {
+        std::cerr << "\nInvalid Option: " << '\'' << argv[invalidIdx] << "\'\n";
+    }
+
+    if(help || invalid)
+    {
+        displayManual();
+        exit(1);
+    }
+
+    if(*(options + 2))  // No point in reading from file if we already have to make API calls to write to files
+    {
+        *(options + 1) = false;
     }
 }
 
+/**
+ * Function to display usage manual.
+ */
 void displayManual()
 {
-    std::cout << "---------------------------------------------\n"
-              << "|           STOCKWATCH MANUAL               |\n"
-              << "---------------------------------------------\n"
-              << "   OPTION               DESCRIPTION\n"
-              << " -h, --help    - Display Manual\n"
-              << " --nyse        - Also scans all stocks on the\n"
-              << "                 NYSE. (Only scans NASDAQ by\n"
-              << "                 default)\n"
-              << " --write-file  - Writes historical data to file.\n"
-              << "                 Files are stored in directory\n"
-              << "                 named DataFiles (which will be\n"
-              << "                 created if non-existing)\n"
-              << " --read-file   - Reads historical data from\n"
-              << "                 files in directory DataFiles\n"
-              << "                 Can only use this option when\n"
-              << "                 running with \'--write-file\'\n"
-              << "                 or if previously ran with\n"
-              << "                 \'--write-file\'. (Meant to\n"
-              << "                 save on API calls)\n\n";
+    std::cout << "\nUsage: ./Build/Analyze [OPTIONS...]\n\n"
+              << "Options:\n"
+              << "  -h, --help          Display usage manual.\n"
+              << "  -n, --nyse          Also scans all stocks on the NYSE.\n"
+              << "                      (Only scans NASDAQ by default)\n"
+              << "  -w, --write-file    Writes historical data of each stock to\n"
+              << "                      a .csv file. Files are stored in directory\n"
+              << "                      ./DataFiles (which will be created if\n"
+              << "                      it doesn't exist already).\n"
+              << "  -r, --read-file     Reads historical data from files in\n"
+              << "                      DataFiles directory instead of making API\n"
+              << "                      calls. Can only use this option if\n"
+              << "                      previously ran with \'--write-file\'.\n\n";
 }

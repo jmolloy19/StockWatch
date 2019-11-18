@@ -18,6 +18,10 @@ add_executable(InputDataTest
     ${CMAKE_CURRENT_SOURCE_DIR}/TestInputData.cpp
 )
 
-add_executable(WriteReadTest
-    ${CMAKE_CURRENT_SOURCE_DIR}/TestWriteRead.cpp
+add_executable(WriteTest
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestWriteFile.cpp
+)
+
+add_executable(ReadTest
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestReadFile.cpp
 )
