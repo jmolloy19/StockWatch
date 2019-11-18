@@ -55,5 +55,4 @@ __Linux/MacOS__
 ```
 
 The two examples above are equivalent.
-
 (For Windows, you would replace the '/'s with '\\'s)
