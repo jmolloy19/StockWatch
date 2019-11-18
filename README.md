@@ -32,7 +32,7 @@ __Linux/MacOS__
 ```
 
 ### Options
-
+```
 -h, --help          Display usage manual.
 
 -n, --nyse          Also scans all stocks on the NYSE. (Only scans NASDAQ by default)
@@ -43,7 +43,7 @@ __Linux/MacOS__
 
 -r, --read-file     Reads historical data from files in DataFiles directory instead of making API calls. 
                     Can only use this option if previously ran with '--write-file'.
-
+```
 ### Usage Examples
 
 ```bash
