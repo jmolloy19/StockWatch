@@ -37,12 +37,12 @@ __Linux/MacOS__
 
 -n, --nyse          Also scans all stocks on the NYSE. (Only scans NASDAQ by default)
 
--w, --write-file    Writes historical data of each stock to a .csv file. Files are stored in directory
-                    a .csv file. Files are stored in directory ./DataFiles (which will be created
+-w, --write-file    Writes historical data of each stock to a .csv file.
+                    Files are stored in directory ./DataFiles (which will be created
                     if it doesn't exist already).
 
--r, --read-file     Reads historical data from files in DataFiles directory instead of making API calls. 
-                    Can only use this option if previously ran with '--write-file'.
+-r, --read-file     Reads historical data from files from .csv files instead of making API calls. 
+                    Can only use this option if previously ran with '--write-file' option.
 ```
 ### Usage Examples
 
