@@ -5,9 +5,9 @@ Requests historical data for all stocks on NASDAQ and NYSE and scans for high ti
 ## Dependencies
 
 This project requires: 
-..* [curl](https://curl.haxx.se/download.html)
-..* [CMake](https://cmake.org/download/)
-..* [World Trading Data API](https://www.worldtradingdata.com/)
+* [curl](https://curl.haxx.se/download.html)
+* [CMake](https://cmake.org/download/)
+* [World Trading Data API](https://www.worldtradingdata.com/)
 
 Note: World Trading Data offers a free API key however it only allows 250 requests/day. 
       The 8 dollars a month API key allows 5000 requests/day, which easily covers all of the NASDAQ and most of the NYSE.
