@@ -1,13 +1,12 @@
-#include <curl/curl.h>
-#include <iostream>
 #include <StockWatch/HistoricalData.hpp>
-#include <StockWatch/Api.hpp>
-
 
 /**
- * This function is the callback function that gets called by libcurl as soon as there is data received 
- * that needs to be saved. *contents points to the delivered data, nmemb is the size of the delievered data,
- * size is always 1, and *userp points to where the delivered data will be written. 
+ * This function is the callback function that gets called by libcurl as soon as there 
+ * is data received that needs to be saved.
+ * @param contents points to delivered data 
+ * @param nmemb    the size of delievered data,
+ * @param size     is always 1
+ * @param userp    points to where delivered data will be written 
  */
 static size_t writeDataCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {	
@@ -24,9 +23,9 @@ static size_t writeDataCallback(void *contents, size_t size, size_t nmemb, void 
 }
 
 /**
- * This function takes as input a string that is a stock symbol. It then uses libcurl to make a HTTP request for the files 
- * containing historical data of the stock specified by the symbol. It then writes this data into the string
- * readBuffer
+ * Makes a HTTP request for the file containing historical data and writes it to a string.
+ * @param symbol     of stock who's data is being requested
+ * @param readBuffer string that historical data will be written to
  */
 void fetchHistoricalData(const std::string& symbol, std::string* readBuffer)
 {

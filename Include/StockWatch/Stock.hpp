@@ -1,4 +1,6 @@
 #pragma once
+#include <StockWatch/HistoricalData.hpp>
+#include <Utility/Utility.hpp>
 #include <vector>
 #include <string>
 #include <iostream>
@@ -9,13 +11,14 @@ class Stock
 	public:
 		Stock() = delete;
 		Stock(const Stock& s) = delete;
-		Stock& operator=(const Stock&) = delete;
-		Stock(Stock&&) = default;
+		Stock& operator=(const Stock &) = delete;
         Stock(const std::string& symbol);
-		void inputData();
-		bool exhibitsHTF();
+		Stock(Stock &&) = default;
+		void analyze(bool read = false, bool write = false);
 		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
 	private:
+		void inputData(bool read = false, bool write = false);
+		bool exhibitsHTF();
 		std::vector<double> closes_;
 		std::vector<int> volumes_;
         std::string name_;

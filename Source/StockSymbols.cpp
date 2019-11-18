@@ -1,13 +1,12 @@
-#include <curl/curl.h>
-#include <iostream>
-#include <algorithm>
 #include <StockWatch/StockSymbols.hpp>
 
-
 /**
- * This function is the callback function that gets called by libcurl as soon as there is data received 
- * that needs to be saved. For its arguments, *contents points to the delivered data, nmemb is the size of the
- * delivered data, size is always 1, and *userp points to where the delivered data will be written.
+ * This function is the callback function that gets called by libcurl as soon as there 
+ * is data received that needs to be saved.
+ * @param contents points to delivered data 
+ * @param nmemb    the size of delievered data,
+ * @param size     is always 1
+ * @param userp    points to where delivered data will be written
  */
 static size_t writeSymbolsCallback(void *contents, size_t size, size_t nmemb, void *userp)
 {	
@@ -24,10 +23,11 @@ static size_t writeSymbolsCallback(void *contents, size_t size, size_t nmemb, vo
 }
 
 /**
- * This function uses libcurl to make HTTP requests for files containing the names and symbols of all stocks
- * listed on the NASDAQ and NYSE. It then writes the data from these files into the passed string (readBuffer)
+ * Makes a HTTP request for the files containing stock symbols and writes it to a string.
+ * @param readBuffer string that stock symbols will be written to
+ * @param nyse 	     if true, also gets stock symbols on NYSE. Else, just NASDAQ
  */
-void fetchStockSymbols(std::string* readBuffer)
+bool fetchStockSymbols(std::string* readBuffer, bool nyse)
 {
 	CURL *curl;
 	CURLcode res;
@@ -43,58 +43,78 @@ void fetchStockSymbols(std::string* readBuffer)
 	    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);												  // Disable curl verifying the authenticity of a peer's SSL certificate
 	    res = curl_easy_perform(curl);
 	    if(res != CURLE_OK)
+		{
 	    	std::cerr << curl_easy_strerror(res);
-	    else
+			return false;
+		}
+	    else if(nyse)
 	    {
 	    	curl_easy_setopt(curl, CURLOPT_URL, "ftp://ftp.nasdaqtrader.com/symboldirectory/otherlisted.txt"); // Change URL to be used in second request (List of NYSE stocks)
 	     	res = curl_easy_perform(curl);
 	    	if(res != CURLE_OK)
+			{
 	    		std::cerr << curl_easy_strerror(res);
+				return false;
+			}
 	    	else
 	    	{
 	    		curl_easy_cleanup(curl);
 	    		curl_global_cleanup();
 			}
 		}
-    }	
+		return true;
+    }
+	else
+	{
+		std::cerr << "Issue initializing curl\n";
+		return false;
+	}
+		
 }
 
 /**
- * This function calls fetchStockSymbols(). It then parses the string for valid
- * stock symbols, and pushes each symbol into passed vector (stockSymbols)
+ * Parses a string for stock symbols, and pushes each valid symbol into a vector.
+ * @param stockSymbols pointer to vector that stock symbols will be pushed into
+ * @param nyse		   if true, also gets stock symbols on NYSE. Else, just NASDAQ
  */
-void createSymbolList(std::vector<std::string>* stockSymbols)
+void createSymbolList(std::vector<std::string>* stockSymbols, bool nyse)
 {
     std::string readBuffer;
-    fetchStockSymbols(&readBuffer);
+    if(!fetchStockSymbols(&readBuffer, nyse))
+	{
+		return;
+	}
 
 	std::string::const_iterator it, 
 						        begin = readBuffer.begin(), 
 						        end = readBuffer.end();
 						   
-	it = find(begin, end, '\n') + 1; 					// + 1 for position of character after '\n' (it points to first character in second line)
+	it = find(begin, end, '\n') + 1; 					// Skip header line
 	
-	while(it != end)									// Loops through readBuffer until end is reached
+	while(it != end)
 	{
 		std::string symbol(it, find(it, end, '|'));		// Parses line for stock symbol
-		if(checkValidSymbol(symbol))					// Checks if symbol is valid, and if so, pushes it onto the vector stockSymbols
+		if(isValidSymbol(symbol))						
 			stockSymbols->push_back(symbol);
 		it = find(it, end, '\n') + 1;
 	}
+	
+	std::cout << "Total # of Stock Symbols Extracted: " << stockSymbols->size() << "\n\n";
 }
 
 /**
- * This function takes as input a string and verifies whether the string is a valid stock symbol
+ * Verifies whether the string is a valid stock symbol.
+ * @param symbol string to verify
  */
-bool checkValidSymbol(const std::string& symbol)
+bool isValidSymbol(const std::string& symbol)
 {
-	if(symbol.size() > 5)									// Any symbol greater than 5 characters is probably not a valid stock symbol
+	if(symbol.size() > 5)									// Exclude any symbol greater than 5 characters
 		return false;
 	else
 	{
 		std::string::const_iterator it;
-		for(it = symbol.begin(); it != symbol.end(); it++)	// Any symbol containing characters outside of the range 'A' - 'Z'
-			if(*it < 65 || *it > 90)					    // is probably not a valid stock symbol (or not what I'm looking to analyze)
+		for(it = symbol.begin(); it != symbol.end(); it++)	// Exclude any symbol containing characters outside range 'A' - 'Z'
+			if(*it < 65 || *it > 90)					    
 				return false;
 		return true;
 	}

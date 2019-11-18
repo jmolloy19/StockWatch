@@ -4,6 +4,6 @@
 int main(int argc, char* argv[])
 {
     Stock stock("AAPL");
-    stock.analyze();
+    stock.analyze(false, true);
     std::cout << stock;
 }

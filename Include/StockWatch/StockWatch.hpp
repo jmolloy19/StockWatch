@@ -1,7 +1,9 @@
 #pragma once
-#include <StockWatch/Api.hpp>
 #include <StockWatch/Stock.hpp>
 #include <StockWatch/StockSymbols.hpp>
 #include <StockWatch/HistoricalData.hpp>
+#include <iostream>
+#include <thread>
 
-void analyze(const std::string& symbol);
+#define MAX_OPTIONS   3
+#define THREAD_COUNT 10

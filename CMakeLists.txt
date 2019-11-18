@@ -4,7 +4,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "-std=c++14")
 project(StockWatch)
 
-#find_package(CURL REQUIRED)
+add_subdirectory(Source/Utility)
+
+find_package(CURL)
 set(SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Source)
 set(STOCKWATCH_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/Include)
 
@@ -12,12 +14,12 @@ add_library(StockWatch STATIC
     ${SOURCE_DIR}/Stock.cpp
     ${SOURCE_DIR}/HistoricalData.cpp
     ${SOURCE_DIR}/StockSymbols.cpp
-    ${SOURCE_DIR}/Analyze.cpp
 )
 
 target_link_libraries(StockWatch PUBLIC
     -lcurl
     -lpthread
+    Utility
 )
 
 target_include_directories(StockWatch PUBLIC
