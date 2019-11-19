@@ -5,7 +5,6 @@
  */
 Stock::Stock(const std::string& symbol) : 
 	name_(symbol), 
-	gotValidData_(false), 
 	numDays_(0)
 {}
 
@@ -89,24 +88,21 @@ void Stock::analyze(bool read, bool write)
  */
 bool Stock::exhibitsHTF()
 {
-	if( !gotValidData_ || numDays_ < 60 )													
+	if(numDays_ < 60 )													
 		return false;
 		
 	std::vector<double>::iterator it,
 							      mostRecent = closes_.begin(),
-							      highest = max_element(mostRecent, mostRecent + 60),
-							      lowest = min_element(mostRecent , mostRecent + 60);
-	
+							      lowest = min_element(mostRecent , mostRecent + 60),
+								  highest = max_element(mostRecent, lowest);
 	if(*lowest == 0.0)
 		return false;
 	else if (*highest / *lowest < 1.9)
 		return false;
-	else if(highest > lowest)			
-		return false;
 	else if( std::distance(mostRecent, highest) > 15 )
 		return false;
 	else
-		for(it = mostRecent; it <= mostRecent + 15; it++)
+		for(it = mostRecent; it < highest; it++)
 			if( *it < (*highest * .8) )
 				return false;
 			

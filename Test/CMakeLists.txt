@@ -29,3 +29,7 @@ add_executable(ReadTest
 add_executable(OptionsParserTest
     ${CMAKE_CURRENT_SOURCE_DIR}/TestOptionsParser.cpp
 )
+
+add_executable(ExhibitsHTFTest
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestExhibitsHTF.cpp
+)

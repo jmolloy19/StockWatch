@@ -23,5 +23,4 @@ class Stock
 		std::vector<int> volumes_;
         std::string name_;
 		int numDays_;
-        bool gotValidData_;	
 };
