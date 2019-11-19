@@ -72,12 +72,14 @@ void checkCmdLineOptions(int argc, char* argv[], bool* options)
             }
             else if(strcmp(argv[i], "--help") == 0)
             {
-                help = true;      
+                help = true;
+                break;      
             }
             else
             {
                 invalid = true;
                 invalidIdx = i;
+                break;
             }  
         }   
     }

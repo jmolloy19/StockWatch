@@ -1,9 +1,8 @@
 #include <StockWatch/StockWatch.hpp>
-#include <iostream>
 
 int main(int argc, char* argv[])
 {
-    std::vector<std::string> symbols, nasdaq, nasdaqAndNyse;
+    std::vector<std::string> symbols;
 
     createSymbolList(&symbols, false);
     for(int i = 0; i < symbols.size(); i++)
@@ -17,5 +16,5 @@ int main(int argc, char* argv[])
 
     symbols.clear();
     std::cout << "NASDAQ:\n";
-    createSymbolList(&nasdaq, false);
+    createSymbolList(&symbols, false);
 }

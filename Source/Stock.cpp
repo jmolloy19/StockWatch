@@ -3,10 +3,7 @@
 /**
  * Constructor for Stock class. 
  */
-Stock::Stock(const std::string& symbol) : 
-	name_(symbol), 
-	numDays_(0)
-{}
+Stock::Stock(const std::string& symbol) : name_(symbol), numDays_(0) {}
 
 /**
  * Parses historical data for closing prices and volumes of each trading day.
@@ -80,7 +77,9 @@ void Stock::analyze(bool read, bool write)
 {
 	inputData(read, write);
     if(exhibitsHTF())
+	{
         std::cout << name_ << "\n";
+	}
 }
 
 /**
@@ -88,23 +87,37 @@ void Stock::analyze(bool read, bool write)
  */
 bool Stock::exhibitsHTF()
 {
-	if(numDays_ < 60 )													
+	if(numDays_ < 60 )
+	{
 		return false;
+	}													
 		
 	std::vector<double>::iterator it,
 							      mostRecent = closes_.begin(),
 							      lowest = min_element(mostRecent , mostRecent + 60),
 								  highest = max_element(mostRecent, lowest);
 	if(*lowest == 0.0)
+	{
 		return false;
+	}
 	else if (*highest / *lowest < 1.9)
+	{
 		return false;
+	}
 	else if( std::distance(mostRecent, highest) > 15 )
+	{
 		return false;
+	}
 	else
+	{
 		for(it = mostRecent; it < highest; it++)
+		{
 			if( *it < (*highest * .8) )
+			{
 				return false;
+			}
+		}	
+	}
 			
 	return true;
 }
@@ -117,6 +130,8 @@ std::ostream& operator << (std::ostream& out, const Stock& stock)
 	out << "Stock = " << stock.name_ << "\n";
 	out << "#\tCloses\tVolume\n";
 	for(int i = 0; i < stock.numDays_; i++)
+	{
 		out << i << "\t" << stock.closes_[i] << "\t" << stock.volumes_[i] << "\n";
+	}
     return out;
 }
