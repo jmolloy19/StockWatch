@@ -25,3 +25,7 @@ add_executable(WriteTest
 add_executable(ReadTest
     ${CMAKE_CURRENT_SOURCE_DIR}/TestReadFile.cpp
 )
+
+add_executable(OptionsParserTest
+    ${CMAKE_CURRENT_SOURCE_DIR}/TestOptionsParser.cpp
+)

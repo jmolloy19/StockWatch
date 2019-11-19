@@ -28,7 +28,7 @@ target_include_directories(StockWatch PUBLIC
 )
 
 add_executable(Analyze
-    ${SOURCE_DIR}/main.cpp
+    ${SOURCE_DIR}/Main.cpp
 )
 
 target_link_libraries(Analyze

@@ -37,7 +37,7 @@ void checkCmdLineOptions(int argc, char* argv[], bool* options)
                 }
                 else if(argv[i][c] == 'w')
                 {
-                    *(options + 1) = true;
+                    *(options + 2) = true;
                     continue;
                 }
                 else if(argv[i][c] == 'h')

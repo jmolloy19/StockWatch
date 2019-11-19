@@ -99,7 +99,7 @@ bool Stock::exhibitsHTF()
 	
 	if(*lowest == 0.0)
 		return false;
-	else if (*highest / *lowest < 2.0)
+	else if (*highest / *lowest < 1.9)
 		return false;
 	else if(highest > lowest)			
 		return false;
