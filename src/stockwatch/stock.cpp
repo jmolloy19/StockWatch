@@ -1,45 +1,34 @@
-#include <StockWatch/Stock.hpp>
+#include <stockwatch/stock.hpp>
 
 /**
  * Constructor for Stock class. 
  */
-Stock::Stock(const std::string& symbol) : name_(symbol), numDays_(0) {}
+Stock::Stock(const std::string& symbol) : stock_name_(symbol), number_of_days_(0) {}
 
 /**
  * Parses historical data for closing prices and volumes of each trading day.
  * Data is pushed in the order of most recent trading day first to oldest trading day last.
- * @param read  if true, retrieves historical data from files. Else retrieves data from API calls
- * @param write if true, writes historical data to files
+ * @param historical_data string of historical data that will be parsed and inputted into object
+ * @param write_to_file   if true, writes historical data to file in datafiles directory
  */
-void Stock::inputData(bool read, bool write)
+void Stock::InputHistoricalData(const std::string& historical_data, bool write_to_file)
 {
-	std::string historicalData;
-
-	if(read)
+	if(write_to_file)
 	{
-		readFromFile(name_ + ".csv", &historicalData);	
-	}
-	else
-	{	
-    	fetchHistoricalData(name_, &historicalData);
-	}
-
-	if(write)
-	{
-		writeToFile(name_ + ".csv", historicalData);	
+		WriteToFile(stock_name_ + ".csv", historical_data);	
 	}
 	
-    std::string csvHeader = "Date,Open,Close,High,Low,Volume";
+    std::string csv_header = "Date,Open,Close,High,Low,Volume";
 
-	if(historicalData.find(csvHeader) == -1)
+	if(historical_data.find(csv_header) == -1)
 	{
-		std::cerr << "Unexpected response from World Trading Data API: " << name_ << ": " << historicalData << "\n";
+		std::cerr << "Unexpected response from World Trading Data API: " << stock_name_ << ": " << historical_data << "\n";
 	}
 	else	
     {                                                        															       
 		std::string::const_iterator it,
-							        begin = historicalData.begin(), 
-							        end = historicalData.end();
+							        begin = historical_data.begin(), 
+							        end = historical_data.end();
 		
 		size_t found = 32;							                 // Skip header	    
 	
@@ -47,18 +36,18 @@ void Stock::inputData(bool read, bool write)
 		{	
             for(int i = 0; i < 2; i++)                               // Sets 'found' to position of comma before close value
             {
-                found = historicalData.find(',', found + 1);  
+                found = historical_data.find(',', found + 1);  
             }
 			if (found != -1)						              	 // Check to make sure we're not past last trading day entry
 			{
-				numDays_++;							    
+				number_of_days_++;							    
 				it = begin + found + 1; 					      	 // Sets 'it' to position of start of close value
 				std::string closeStr(it, std::find(it, end, ','));	 // Extract close value
 				closes_.push_back(std::stod(closeStr));
 
                 for(int i = 0; i < 3; i++)                           // Set 'found' to position of comma before volume value
                 {
-                    found = historicalData.find(',', found + 1);  
+                    found = historical_data.find(',', found + 1);  
                 }                  
                 it = begin + found + 1; 					      	 // Sets 'it' to position of start of volume value
 				std::string volumeStr(it, std::find(it, end, '\n')); // Extract volume value
@@ -71,31 +60,34 @@ void Stock::inputData(bool read, bool write)
 
 /**
  * Analyzes stock data and prints name if it exhibits pattern.
- * @param options pointer to array specifying given command line options
+ * @param cmd_line_options pointer to array specifying given command line options
  */
-void Stock::analyze(bool read, bool write)
+void Stock::AnalyzeStock(const bool* cmd_line_options)
 {
-	inputData(read, write);
-    if(exhibitsHTF())
+	std::string historical_data;
+
+	GetHistoricalData(stock_name_, &historical_data, *(cmd_line_options + 1));
+	InputHistoricalData(historical_data, *(cmd_line_options + 2));
+    if(ExhibitsHighTightFlag())
 	{
-        std::cout << name_ << "\n";
+        std::cout << stock_name_ << "\n";
 	}
 }
 
 /**
  * Returns true if a stock exhibits the high and tight flag pattern.
  */
-bool Stock::exhibitsHTF()
+bool Stock::ExhibitsHighTightFlag()
 {
-	if(numDays_ < 60 )
+	if(number_of_days_ < 60 )
 	{
 		return false;
 	}													
 		
 	std::vector<double>::iterator it,
-							      mostRecent = closes_.begin(),
-							      lowest = min_element(mostRecent , mostRecent + 60),
-								  highest = max_element(mostRecent, lowest);
+							      most_recent = closes_.begin(),
+							      lowest = min_element(most_recent , most_recent + 60),
+								  highest = max_element(most_recent, lowest);
 	if(*lowest == 0.0)
 	{
 		return false;
@@ -104,13 +96,13 @@ bool Stock::exhibitsHTF()
 	{
 		return false;
 	}
-	else if( std::distance(mostRecent, highest) > 15 )
+	else if( std::distance(most_recent, highest) > 15 )
 	{
 		return false;
 	}
 	else
 	{
-		for(it = mostRecent; it < highest; it++)
+		for(it = most_recent; it < highest; it++)
 		{
 			if( *it < (*highest * .8) )
 			{
@@ -127,9 +119,9 @@ bool Stock::exhibitsHTF()
  */ 
 std::ostream& operator << (std::ostream& out, const Stock& stock)
 {
-	out << "Stock = " << stock.name_ << "\n";
+	out << "Stock = " << stock.stock_name_ << "\n";
 	out << "#\tCloses\tVolume\n";
-	for(int i = 0; i < stock.numDays_; i++)
+	for(int i = 0; i < stock.number_of_days_; i++)
 	{
 		out << i << "\t" << stock.closes_[i] << "\t" << stock.volumes_[i] << "\n";
 	}

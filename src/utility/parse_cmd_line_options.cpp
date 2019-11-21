@@ -1,4 +1,4 @@
-#include <Utility/CmdLineOptions.hpp>
+#include <utility/parse_cmd_line_options.hpp>
 
 /**
  * Function to parse command line arguments for options.
@@ -6,7 +6,7 @@
  * @param argv[]  array of command line arguments
  * @param options pointer to array specifying given command line options
  */
-void checkCmdLineOptions(int argc, char* argv[], bool* options)
+void ParseCmdLineOptions(int argc, char* argv[], bool* options)
 {
     bool invalid = false;
     int invalidIdx;
@@ -91,7 +91,7 @@ void checkCmdLineOptions(int argc, char* argv[], bool* options)
 
     if(help || invalid)
     {
-        displayManual();
+        DisplayManual();
         exit(1);
     }
 
@@ -104,19 +104,19 @@ void checkCmdLineOptions(int argc, char* argv[], bool* options)
 /**
  * Function to display usage manual.
  */
-void displayManual()
+void DisplayManual()
 {
-    std::cout << "\nUsage: ./Build/Analyze [OPTIONS...]\n\n"
+    std::cout << "\nUsage: ./build/AnalyzeStocks [OPTIONS...]\n\n"
               << "Options:\n"
               << "  -h, --help          Display usage manual.\n"
               << "  -n, --nyse          Also scans all stocks on the NYSE.\n"
               << "                      (Only scans NASDAQ by default)\n"
               << "  -w, --write-file    Writes historical data of each stock to\n"
               << "                      a .csv file. Files are stored in directory\n"
-              << "                      ./DataFiles (which will be created if\n"
+              << "                      ./datafiles (which will be created if\n"
               << "                      it doesn't exist already).\n"
               << "  -r, --read-file     Reads historical data from files in\n"
-              << "                      DataFiles directory instead of making API\n"
+              << "                      datafiles directory instead of making API\n"
               << "                      calls. Can only use this option if\n"
               << "                      previously ran with \'--write-file\'.\n\n";
 }

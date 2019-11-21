@@ -1,8 +1,8 @@
 #!/bin/bash
 set -eu
-rm -rf Build || true
-mkdir Build
-cd Build
+rm -rf build || true
+mkdir build
+cd build
 cmake ..
 make -j
 cd -
