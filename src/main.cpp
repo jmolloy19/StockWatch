@@ -4,7 +4,6 @@
 
 int main(int argc, char* argv[])
 {
-    
     bool cmd_line_options[MAX_OPTIONS] = {false};
     ParseCmdLineOptions(argc, argv, cmd_line_options);
 
