@@ -1,4 +1,4 @@
-# Stock
+# StockWatch
 
 Requests historical data for all stocks on NASDAQ and NYSE and scans for high tight flag patterns.
 
