@@ -36,6 +36,5 @@ int main(int argc, char* argv[])
 
         if(i % 100 == 0)
             std::cout << i << " Stocks Done\n" << std::flush;
-    }
-    
+    }  
 }
