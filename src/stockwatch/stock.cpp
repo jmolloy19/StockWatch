@@ -9,7 +9,7 @@ Stock::Stock(const std::string& symbol) : stock_name_(symbol), number_of_days_(0
  * Parses historical data for closing prices and volumes of each trading day.
  * Data is pushed in the order of most recent trading day first to oldest trading day last.
  * @param historical_data 	string of historical data that will be parsed and inputted into object
- * @param write_to_file   	if true, writes historical data to file in stockdatafiles directory
+ * @param write_to_file   	if true, writes historical data to file in datafiles directory
  */
 void Stock::InputHistoricalData(const std::string& historical_data)
 {

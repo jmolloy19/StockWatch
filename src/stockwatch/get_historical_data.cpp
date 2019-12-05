@@ -2,7 +2,7 @@
 
 /**
  * Gets the historical data of the stock. If read_from_file is true, it reads the historical data 
- * from the corresponding file in the 'stockdatafiles' directory. Else, it makes an API call for the data
+ * from the corresponding file in the 'datafiles' directory. Else, it makes an API call for the data
  * @param historical_data 	string that historical data will be written to 
  * @param options		  	contains the options passed through the command line
  */
@@ -18,7 +18,7 @@ void GetHistoricalData(const std::string& stock_symbol, std::string* historical_
 
 	if(options.ReadFromFile())
 	{
-		ReadFromFile(stock_symbol + ".csv", historical_data);
+		ReadFromFile(stock_symbol, historical_data);
 	}
 	else
 	{

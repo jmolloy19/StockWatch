@@ -24,7 +24,7 @@ void ReadFromFile(const std::string& stock_name, std::string* read_buffer)
 }
 
 /**
- * Writes string to file in directory stockdatafiles.
+ * Writes string to file in directory datafiles.
  * File is named '<stock_name>.csv'. ie. AAPL.csv
  * @param stock_name    name of stock (ticker symbol)
  * @param write_buffer  string that will be written to file
