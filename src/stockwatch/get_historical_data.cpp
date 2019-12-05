@@ -24,7 +24,7 @@ void GetHistoricalData(const std::string& stock_symbol, std::string* historical_
 
 	if(read_from_file)
 	{
-		ReadFromFile(stock_symbol, historical_data);
+		ReadFromFile(stock_symbol + ".csv", historical_data);
 	}
 	else
 	{
