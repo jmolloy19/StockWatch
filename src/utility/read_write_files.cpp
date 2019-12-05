@@ -3,8 +3,8 @@
 
 /**
  * Writes string to file.
- * @param file_name    file path and name
- * @param write_buffer string that will be written to file
+ * @param file_name     file path and name
+ * @param write_buffer  string that will be written to file
  */
 void WriteToFile(const std::string& file_name, const std::string& write_buffer)
 {
@@ -32,8 +32,8 @@ void WriteToFile(const std::string& file_name, const std::string& write_buffer)
 
 /**
  * Reads file contents and writes to string.
- * @param file_name   file path and name
- * @param read_buffer string that will be written to
+ * @param file_name     file path and name
+ * @param read_buffer   string that will be written to
  */
 void ReadFromFile(const std::string& file_name, std::string* read_buffer)
 {

@@ -8,8 +8,8 @@ Stock::Stock(const std::string& symbol) : stock_name_(symbol), number_of_days_(0
 /**
  * Parses historical data for closing prices and volumes of each trading day.
  * Data is pushed in the order of most recent trading day first to oldest trading day last.
- * @param historical_data string of historical data that will be parsed and inputted into object
- * @param write_to_file   if true, writes historical data to file in datafiles directory
+ * @param historical_data 	string of historical data that will be parsed and inputted into object
+ * @param write_to_file   	if true, writes historical data to file in datafiles directory
  */
 void Stock::InputHistoricalData(const std::string& historical_data, bool write_to_file)
 {
@@ -34,22 +34,22 @@ void Stock::InputHistoricalData(const std::string& historical_data, bool write_t
 	
         while(it != end)						                
 		{	
-            for(int i = 0; i < 2; i++)                               // Sets 'found' to position of comma before close value
+            for(int i = 0; i < 2; i++)                               // Sets 'found' to comma before close value
             {
                 found = historical_data.find(',', found + 1);  
             }
-			if (found != -1)						              	 // Check to make sure we're not past last trading day entry
+			if (found != -1)						              	 // Check we're not past last trading day entry
 			{
 				number_of_days_++;							    
-				it = begin + found + 1; 					      	 // Sets 'it' to position of start of close value
+				it = begin + found + 1; 					      	 // Sets 'it' to start of close value
 				std::string closeStr(it, std::find(it, end, ','));	 // Extract close value
 				closes_.push_back(std::stod(closeStr));
 
-                for(int i = 0; i < 3; i++)                           // Set 'found' to position of comma before volume value
+                for(int i = 0; i < 3; i++)                           // Set 'found' to comma before volume value
                 {
                     found = historical_data.find(',', found + 1);  
                 }                  
-                it = begin + found + 1; 					      	 // Sets 'it' to position of start of volume value
+                it = begin + found + 1; 					      	 // Sets 'it' to start of volume value
 				std::string volumeStr(it, std::find(it, end, '\n')); // Extract volume value
 				volumes_.push_back(std::stoi(volumeStr));
                 it = std::find(it, end, ',');
@@ -60,7 +60,7 @@ void Stock::InputHistoricalData(const std::string& historical_data, bool write_t
 
 /**
  * Analyzes stock data and prints name if it exhibits pattern.
- * @param cmd_line_options pointer to array specifying given command line options
+ * @param cmd_line_options 	pointer to array specifying given command line options
  */
 void Stock::AnalyzeStock(const bool* cmd_line_options)
 {

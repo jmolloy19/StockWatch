@@ -4,10 +4,13 @@
 /**
  * World Trading Data API
  * Documention: https://www.worldtradingdata.com/documentation#full-history
- * Test URI : https://api.worldtradingdata.com/api/v1/history?symbol=AAPL&sort=newest&api_token=5mTLsc1GwvEkMo3AGEu00wh5BVgzz2Jwdg14lm66ohX9cnGFntMpZyJdM6WA&output=csv&date_from=2019-06-08
+ * Replace 'Insert_Your_API_Key_Here' with your API key and keep it within the double quotes.
+ * ie. const std::string API_KEY = "myExampleApiKey_IAmAPoorBoyToo_5318008";
+ * You can also change the number of trading days requested by changing 'START_DATE'.
+ * It takes the format of YYYY-MM-DD
+ * See World Trading Data API Documentation link above for more details.
  */
-const std::string url_base = "https://api.worldtradingdata.com/api/v1/history?symbol=";
-const std::string sort = "&sort=newest";
-const std::string api_key = "&api_token=5mTLsc1GwvEkMo3AGEu00wh5BVgzz2Jwdg14lm66ohX9cnGFntMpZyJdM6WA";
-const std::string output = "&output=csv";
-const std::string start_date = "&date_from=2019-06-08";
+
+const std::string API_KEY = "Insert_Your_API_Key_Here";
+const std::string START_DATE = "2019-06-08";
+

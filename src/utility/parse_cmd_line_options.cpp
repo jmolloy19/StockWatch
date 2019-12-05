@@ -2,9 +2,9 @@
 
 /**
  * Function to parse command line arguments for options.
- * @param argc    command line argument count
- * @param argv[]  array of command line arguments
- * @param options pointer to array specifying given command line options
+ * @param argc      command line argument count
+ * @param argv[]    array of command line arguments
+ * @param options   pointer to array specifying given command line options
  */
 void ParseCmdLineOptions(int argc, char* argv[], bool* options)
 {
@@ -95,7 +95,7 @@ void ParseCmdLineOptions(int argc, char* argv[], bool* options)
         exit(1);
     }
 
-    if(*(options + 2))  // No point in reading from file if we already have to make API calls to write to files
+    if(*(options + 2))  // No point in reading from file if we already have to make API call to write to file
     {
         *(options + 1) = false;
     }

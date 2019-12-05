@@ -4,7 +4,7 @@
 /**
  * Windows
  * Returns true if the directory was successfully created.
- * @param path directory path and name
+ * @param path  directory path and name
  */
 bool CreateDirectory(const char* path)
 {
@@ -19,8 +19,9 @@ bool CreateDirectory(const char* path)
 }
 #else
 /**
+ * MacOS/Linux
  * Returns true if the directory was successfully created.
- * @param path directory path and name
+ * @param path  directory path and name
  */
 bool CreateDirectory(const char* path)
 {
@@ -37,7 +38,7 @@ bool CreateDirectory(const char* path)
 
 /**
  * Returns true if the directory exists.
- * @param directory directory path and name
+ * @param directory     directory path and name
  */
 bool DirectoryExists(const std::string& directory)
 {
