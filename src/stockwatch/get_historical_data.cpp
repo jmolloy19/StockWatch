@@ -1,18 +1,12 @@
 #include <stockwatch/get_historical_data.hpp>
 
-const std::string URL_BASE = "https://api.worldtradingdata.com/api/v1/history?symbol=";
-const std::string SORT = "&sort=newest";
-const std::string API_KEY_PRETEXT = "&api_token=";
-const std::string OUTPUT = "&output=csv";
-const std::string START_DATE_PRETEXT = "&date_from=";
-
 /**
  * Gets the historical data of the stock. If read_from_file is true, it reads the historical data 
- * from the corresponding file in the datafiles directory. Else, it makes an API call for the data
+ * from the corresponding file in the 'stockdatafiles' directory. Else, it makes an API call for the data
  * @param historical_data 	string that historical data will be written to 
- * @param read_from_file  	if true, retrieves historical data from file. Else retrieves data from API call
+ * @param options		  	contains the options passed through the command line
  */
-void GetHistoricalData(const std::string& stock_symbol, std::string* historical_data, bool read_from_file)
+void GetHistoricalData(const std::string& stock_symbol, std::string* historical_data, const Options& options)
 {
 	if(API_KEY == "Insert_Your_API_Key_Here")
 	{
@@ -22,13 +16,18 @@ void GetHistoricalData(const std::string& stock_symbol, std::string* historical_
 		exit(-1);
 	}
 
-	if(read_from_file)
+	if(options.ReadFromFile())
 	{
 		ReadFromFile(stock_symbol + ".csv", historical_data);
 	}
 	else
 	{
 		RequestHistoricalData(stock_symbol, historical_data);
+	}
+
+	if(options.WriteToFile())
+	{
+		WriteToFile(stock_symbol, *historical_data);
 	}
 }
 
@@ -61,18 +60,17 @@ static size_t RequestHistoricalDataCallback(void *contents, size_t size, size_t 
  */
 void RequestHistoricalData(const std::string& symbol, std::string* historical_data_buffer)
 {
+	std::string request_url = CreateRequestURL(API::HistoricalData, symbol);
+	
 	CURL *curl;
 	CURLcode res;
-	
-	std::string url_combined = URL_BASE + symbol + SORT + API_KEY_PRETEXT + API_KEY + 
-							   OUTPUT + START_DATE_PRETEXT + START_DATE;
 
 	curl_global_init(CURL_GLOBAL_ALL);
 	curl = curl_easy_init();
 	if(curl) 
 	{
 		historical_data_buffer->clear();
-		curl_easy_setopt(curl, CURLOPT_URL, url_combined.c_str());
+		curl_easy_setopt(curl, CURLOPT_URL, request_url.c_str());
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, RequestHistoricalDataCallback);
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, historical_data_buffer);
 		curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);

@@ -2,7 +2,9 @@
 
 int main(int argc, char* argv[])
 {
-    bool options[MAX_OPTIONS] = {false, false, true};
+    Options options;
+    options.Set(false, false, true);
     Stock stock("AAPL");
-    stock.AnalyzeStock(options);
+    
+    stock.Analyze(options);
 }

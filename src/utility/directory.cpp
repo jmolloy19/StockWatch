@@ -1,8 +1,8 @@
-#include <utility/create_directory.hpp>
+#include <utility/directory.hpp>
 
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
 /**
- * Windows
+ * --Windows--
  * Returns true if the directory was successfully created.
  * @param path  directory path and name
  */
@@ -19,7 +19,7 @@ bool CreateDirectory(const char* path)
 }
 #else
 /**
- * MacOS/Linux
+ * --Linux/MacOS--
  * Returns true if the directory was successfully created.
  * @param path  directory path and name
  */

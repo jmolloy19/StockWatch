@@ -2,8 +2,10 @@
 
 int main(int argc, char* argv[])
 {
-    bool options[MAX_OPTIONS] = {false, true, false};
+    Options options;
+    options.Set(false, true, false);
     Stock stock("AAPL");
-    stock.AnalyzeStock(options);
+    
+    stock.Analyze(options);
     std::cout << stock;
 }

@@ -1,4 +1,5 @@
 #pragma once
-#include <utility/create_directory.hpp>
-#include <utility/parse_cmd_line_options.hpp>
-#include <utility/read_write_files.hpp>
+#include <utility/directory.hpp>
+#include <utility/options.hpp>
+#include <utility/files.hpp>
+#include <utility/manual.hpp>

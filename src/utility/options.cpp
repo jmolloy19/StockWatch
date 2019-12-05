@@ -1,16 +1,20 @@
-#include <utility/parse_cmd_line_options.hpp>
+#include <utility/options.hpp>
 
 /**
- * Function to parse command line arguments for options.
+ *  Default constructor for Options class.
+ */
+Options::Options() {}
+
+/**
+ * Constructor for Options class. Parses command line arguments for program options.
  * @param argc      command line argument count
  * @param argv[]    array of command line arguments
- * @param options   pointer to array specifying given command line options
  */
-void ParseCmdLineOptions(int argc, char* argv[], bool* options)
+Options::Options(int argc, char* argv[])
 {
     bool invalid = false;
-    int invalidIdx;
     bool help = false;
+    int invalidIdx;
 
     for(int i = 1; i < argc && !help && !invalid; i++)
     {
@@ -27,17 +31,17 @@ void ParseCmdLineOptions(int argc, char* argv[], bool* options)
             {
                 if(argv[i][c] == 'n')
                 {
-                    *(options) = true;
+                    include_nyse_ = true;
                     continue;
                 }
                 else if(argv[i][c] == 'r')
                 {
-                    *(options + 1) = true;
+                    read_from_file_ = true;
                     continue;
                 }
                 else if(argv[i][c] == 'w')
                 {
-                    *(options + 2) = true;
+                    write_to_file_ = true;
                     continue;
                 }
                 else if(argv[i][c] == 'h')
@@ -57,17 +61,17 @@ void ParseCmdLineOptions(int argc, char* argv[], bool* options)
         {
             if(strcmp(argv[i], "--nyse") == 0)
             {
-                *(options) = true;
+                include_nyse_ = true;
                 continue;
             }
             else if(strcmp(argv[i], "--read-file") == 0)
             {
-                *(options + 1) = true;
+                read_from_file_ = true;
                 continue;
             }
             else if(strcmp(argv[i], "--write-file") == 0)
             {
-                *(options + 2) = true;
+                write_to_file_ = true;
                 continue;
             }
             else if(strcmp(argv[i], "--help") == 0)
@@ -95,28 +99,42 @@ void ParseCmdLineOptions(int argc, char* argv[], bool* options)
         exit(1);
     }
 
-    if(*(options + 2))  // No point in reading from file if we already have to make API call to write to file
+    if(write_to_file_)  // No point in reading from file if we already have to make API call to write to file
     {
-        *(options + 1) = false;
+        read_from_file_ = false;
     }
 }
 
 /**
- * Function to display usage manual.
+ * Setter function to set options
  */
-void DisplayManual()
+void Options::Set(bool nyse, bool read, bool write)
 {
-    std::cout << "\nUsage: ./build/AnalyzeStocks [OPTIONS...]\n\n"
-              << "Options:\n"
-              << "  -h, --help          Display usage manual.\n"
-              << "  -n, --nyse          Also scans all stocks on the NYSE.\n"
-              << "                      (Only scans NASDAQ by default)\n"
-              << "  -w, --write-file    Writes historical data of each stock to\n"
-              << "                      a .csv file. Files are stored in directory\n"
-              << "                      ./datafiles (which will be created if\n"
-              << "                      it doesn't exist already).\n"
-              << "  -r, --read-file     Reads historical data from files in\n"
-              << "                      datafiles directory instead of making API\n"
-              << "                      calls. Can only use this option if\n"
-              << "                      previously ran with \'--write-file\'.\n\n";
+    include_nyse_ = nyse;
+    read_from_file_ = read;
+    write_to_file_ = write;
+}
+
+/**
+ * Returns option signifying whether to also analyze stocks from the NYSE
+ */
+bool Options::IncludeNYSE() const
+{
+    return include_nyse_;
+}
+
+/**
+ * Returns option signifying whether to read historical data from files
+ */
+bool Options::ReadFromFile() const
+{
+    return read_from_file_;
+}
+
+/**
+ * Returns option signifying whether to write historical data to files
+ */
+bool Options::WriteToFile() const
+{
+    return write_to_file_;
 }

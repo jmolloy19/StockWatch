@@ -2,8 +2,9 @@
 
 int main(int argc, char* argv[])
 {
-    bool options[MAX_OPTIONS] = {false};
+    Options options;
     Stock stock("AAPL");
-    stock.AnalyzeStock(options);
+    
+    stock.Analyze(options);
     std::cout << stock;
 }

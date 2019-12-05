@@ -9,15 +9,10 @@ Stock::Stock(const std::string& symbol) : stock_name_(symbol), number_of_days_(0
  * Parses historical data for closing prices and volumes of each trading day.
  * Data is pushed in the order of most recent trading day first to oldest trading day last.
  * @param historical_data 	string of historical data that will be parsed and inputted into object
- * @param write_to_file   	if true, writes historical data to file in datafiles directory
+ * @param write_to_file   	if true, writes historical data to file in stockdatafiles directory
  */
-void Stock::InputHistoricalData(const std::string& historical_data, bool write_to_file)
+void Stock::InputHistoricalData(const std::string& historical_data)
 {
-	if(write_to_file)
-	{
-		WriteToFile(stock_name_ + ".csv", historical_data);	
-	}
-	
     std::string csv_header = "Date,Open,Close,High,Low,Volume";
 
 	if(historical_data.find(csv_header) == -1)
@@ -59,15 +54,16 @@ void Stock::InputHistoricalData(const std::string& historical_data, bool write_t
 }
 
 /**
- * Analyzes stock data and prints name if it exhibits pattern.
- * @param cmd_line_options 	pointer to array specifying given command line options
+ * Gets the historical data for the stock, and inputs the data into the object.
+ * It then prints the name of the stock if it exhibits any patterns.
+ * @param options	options passed through the command line
  */
-void Stock::AnalyzeStock(const bool* cmd_line_options)
+void Stock::Analyze(const Options& options)
 {
 	std::string historical_data;
 
-	GetHistoricalData(stock_name_, &historical_data, *(cmd_line_options + 1));
-	InputHistoricalData(historical_data, *(cmd_line_options + 2));
+	GetHistoricalData(stock_name_, &historical_data, options);
+	InputHistoricalData(historical_data);
     if(ExhibitsHighTightFlag())
 	{
         std::cout << stock_name_ << "\n";

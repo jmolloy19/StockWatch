@@ -27,7 +27,7 @@ add_executable(ReadFileTest
 )
 
 add_executable(ParseCmdLineOptionsTest
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_parse_cmd_line_options.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_get_cmd_line_options.cpp
 )
 
 add_executable(ExhibitsHTFTest

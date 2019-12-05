@@ -13,10 +13,10 @@ class Stock
 		Stock& operator=(const Stock &) = delete;
         Stock(const std::string& symbol);
 		Stock(Stock &&) = default;
-		void AnalyzeStock(const bool* cmd_line_options);
+		void Analyze(const Options& options);
 		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
 	private:
-		void InputHistoricalData(const std::string& historical_data, bool write_to_file = false);
+		void InputHistoricalData(const std::string& historical_data);
 		bool ExhibitsHighTightFlag();
 		std::vector<double> closes_;
 		std::vector<int> volumes_;
