@@ -9,7 +9,7 @@ void GetStockSymbols(std::vector<std::string>* stock_symbols, bool nyse)
 {
     std::string stock_symbol_buffer;
 	
-    if(!RequestStockSymbols(&stock_symbol_buffer, nyse))
+    if(!RequestStockSymbols(&stock_symbol_buffer))
 	{
 		std::cerr << "Error getting stock symbols\n";
 		exit(-1);
@@ -23,9 +23,25 @@ void GetStockSymbols(std::vector<std::string>* stock_symbols, bool nyse)
 	
 	while(it != end)
 	{
-		std::string symbol(it, find(it, end, '|'));		// Parses line for stock symbol
-		if(IsValidStockSymbol(symbol))						
+		std::string line(it, find(it, end, '\n'));
+
+		std::string symbol;
+		if(line.find("NASDAQ") != std::string::npos)
+		{
+			symbol = std::string(it, find(it, end, ','));
+		}
+		else if(nyse)
+		{
+			if(line.find("NYSE") != std::string::npos)
+			{
+				symbol = std::string(it, find(it, end, ','));
+			}
+		}
+		
+		if(!symbol.empty() && IsValidStockSymbol(symbol))
+		{
 			stock_symbols->push_back(symbol);
+		}						
 		it = find(it, end, '\n') + 1;
 	}
 	
@@ -74,11 +90,12 @@ static size_t RequestStockSymbolsCallback(void *contents, size_t size, size_t nm
 
 /**
  * Makes a HTTP request for the files containing stock symbols and writes it to a string.
- * @param stock_symbol_buffer 	string that stock symbols will be written to
- * @param nyse 	     		  	if true, also gets stock symbols on NYSE. Else, just NASDAQ
+ * @param stock_symbol_buffer 	string that data from API call will be written to
  */
-bool RequestStockSymbols(std::string* stock_symbol_buffer, bool nyse)
+bool RequestStockSymbols(std::string* stock_symbol_buffer)
 {
+	std::string request_url = CreateRequestURL(API::TickerList);
+
 	CURL *curl;
 	CURLcode res;
 	
@@ -87,7 +104,7 @@ bool RequestStockSymbols(std::string* stock_symbol_buffer, bool nyse)
 	if(curl) 
     {
 	  	stock_symbol_buffer->clear();
-	    curl_easy_setopt(curl, CURLOPT_URL, "ftp://ftp.nasdaqtrader.com/symboldirectory/nasdaqlisted.txt");
+	    curl_easy_setopt(curl, CURLOPT_URL, request_url.c_str());
 	    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, RequestStockSymbolsCallback);
 	    curl_easy_setopt(curl, CURLOPT_WRITEDATA, stock_symbol_buffer);
 	    curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, false);
@@ -97,27 +114,12 @@ bool RequestStockSymbols(std::string* stock_symbol_buffer, bool nyse)
 	    	std::cerr << curl_easy_strerror(res);
 			return false;
 		}
-	    else if(nyse)
-	    {
-	    	curl_easy_setopt(curl, CURLOPT_URL, "ftp://ftp.nasdaqtrader.com/symboldirectory/otherlisted.txt"); 
-	     	res = curl_easy_perform(curl);
-	    	if(res != CURLE_OK)
-			{
-	    		std::cerr << curl_easy_strerror(res);
-				return false;
-			}
-	    	else
-	    	{
-	    		curl_easy_cleanup(curl);
-	    		curl_global_cleanup();
-			}
-		}
-		return true;
     }
 	else
 	{
 		std::cerr << "Error initializing curl\n";
 		return false;
 	}
-		
+
+	return true;
 }

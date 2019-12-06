@@ -9,4 +9,4 @@
 void GetStockSymbols(std::vector<std::string>* symbols, bool nyse);
 bool IsValidStockSymbol(const std::string& symbol);
 static size_t RequestStockSymbolsCallback(void *contents, size_t size, size_t nmemb, void *userp);
-bool RequestStockSymbols(std::string* read_buffer, bool nyse = false);
+bool RequestStockSymbols(std::string* read_buffer);
