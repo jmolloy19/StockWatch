@@ -16,9 +16,11 @@ void GetHistoricalData(const std::string& stock_symbol, std::string* historical_
 		exit(-1);
 	}
 
+	std::string file_name = stock_symbol + ".csv";
+
 	if(options.ReadFromFile())
 	{
-		ReadFromFile(stock_symbol, historical_data);
+		ReadFromFile(file_name, kDataFilesPath, historical_data);
 	}
 	else
 	{
@@ -27,7 +29,7 @@ void GetHistoricalData(const std::string& stock_symbol, std::string* historical_
 
 	if(options.WriteToFile())
 	{
-		WriteToFile(stock_symbol, *historical_data);
+		WriteToFile(file_name, kDataFilesPath, *historical_data);
 	}
 }
 

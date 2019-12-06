@@ -1,9 +1,7 @@
 #pragma once
-#include <stockwatch/get_historical_data.hpp>
 #include <vector>
-#include <string>
-#include <iostream>
 #include <algorithm>
+#include <stockwatch/get_historical_data.hpp>
 
 class Stock
 {

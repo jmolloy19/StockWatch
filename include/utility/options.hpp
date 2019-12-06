@@ -1,6 +1,5 @@
 #pragma once
 #include <string.h>
-#include <iostream>
 #include <utility/manual.hpp>
 
 class Options

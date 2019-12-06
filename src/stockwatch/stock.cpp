@@ -1,7 +1,8 @@
 #include <stockwatch/stock.hpp>
 
 /**
- * Constructor for Stock class. 
+ * Constructor for Stock class.
+ * @param symbol  the symbol of the stock 
  */
 Stock::Stock(const std::string& symbol) : stock_name_(symbol), number_of_days_(0) {}
 
