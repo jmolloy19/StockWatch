@@ -51,5 +51,4 @@ bool DirectoryExists(const std::string& directory)
     {
        return false;
     }
-    
 }

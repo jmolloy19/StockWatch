@@ -9,6 +9,7 @@ add_library(utility STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/files.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/directory.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/manual.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/progress_bar.cpp
 )
 
 target_include_directories(utility PUBLIC

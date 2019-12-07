@@ -124,3 +124,19 @@ std::ostream& operator << (std::ostream& out, const Stock& stock)
 	}
     return out;
 }
+
+// /**
+//  * Function returns string of all the tickers that resulted in invalid data.
+//  */ 
+// void GetBadTickers(std::string* tickers)
+// {
+// 	tickers = &Stock::bad_tickers_;
+// }
+
+// /**
+//  * Function returns vector of all stock symbols exhibiting HTF.
+//  */ 
+// void GetHighTightFlags(std::vector<std::string>* high_tight_flags)
+// {
+// 	high_tight_flags = &Stock::high_tight_flags_;
+// }

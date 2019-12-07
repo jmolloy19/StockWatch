@@ -13,6 +13,9 @@ class Stock
 		Stock(Stock &&) = default;
 		void Analyze(const Options& options);
 		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
+		//friend void GetBadTickers(std::string* tickers);
+		//friend void GetHighTightFlags(std::vector<std::string>* high_tight_flags);
+		static std::vector<std::string> high_tight_flags_;
 	private:
 		void InputHistoricalData(const std::string& historical_data);
 		bool ExhibitsHighTightFlag();
@@ -20,4 +23,8 @@ class Stock
 		std::vector<int> volumes_;
         std::string stock_name_;
 		int number_of_days_;
+		static std::string bad_tickers_;
 };
+
+//extern void GetBadTickers(std::string* tickers);
+//extern void GetHighTightFlags(std::vector<std::string>* high_tight_flags);

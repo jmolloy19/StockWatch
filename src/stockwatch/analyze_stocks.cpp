@@ -31,7 +31,21 @@ void AnalyzeStocks(const std::vector<std::string>& stock_symbols, const Options&
         stocks.clear();
         threads.clear();
 
-        if(i % 100 == 0)
-            std::cout << i << " Stocks Done\n" << std::flush;
-    }  
+        DisplayProgressBar(i, num_stocks);
+    }
+}
+
+void PrintReport()
+{
+    Stock report("AAPL");
+    //std::vector<std::string> high_tight_flags;
+    std::cout << "Stocks That Exhibit Pattern";
+    for(int i = 0; i < report.high_tight_flags_.size(); i++)
+    {
+        if(i % 5 == 0)
+        {
+            std::cout << '\n';
+        }
+        std::cout << report.high_tight_flags_[i];
+    }
 }
