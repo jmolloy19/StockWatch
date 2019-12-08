@@ -13,17 +13,15 @@ This project requires:
 Note: World Trading Data offers a free API key however it only allows 250 requests/day. 
       The 8 dollars a month API key allows 5000 requests/day, which easily covers all of the NASDAQ and most of the NYSE.
 
-### Inserting API Key
+#### Inserting Your API Key
 
 You will need to insert your World Trading Data API key into the file
 [world_trading_api.hpp](https://github.com/jmolloy19/StockWatch/blob/master/include/stockwatch/world_trading_api.hpp)
-  
 
-Using **667myExampleApiKey99099IAmAPoorBoyToo77** as my example API Key.I would change...
-```cpp
-const std::string API_KEY = "Insert_Your_API_Key_Here";
-``` 
-To
+```bash
+Your API Key: 667myExampleApiKey99099IAmAPoorBoyToo77
+```
+Using the API Key above as an example, I would insert it into the file like so.
 ```cpp
 const std::string API_KEY = "667myExampleApiKey99099IAmAPoorBoyToo77";
 ``` 
