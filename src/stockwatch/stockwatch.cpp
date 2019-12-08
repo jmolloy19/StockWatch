@@ -1,5 +1,7 @@
 #include <stockwatch/stockwatch.hpp>
 
+const char* kStockListFilePath = "./stocklist.csv";
+
 /**
  * Constructor for Stock class.
  * @param argc      command line argument count

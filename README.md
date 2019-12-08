@@ -4,7 +4,8 @@ Requests historical data for all stocks on NASDAQ and NYSE and scans for high ti
 
 ## Dependencies
 
-This project requires: 
+This project requires:
+* Linux/MacOS Enviroment
 * [curl](https://curl.haxx.se/download.html)
 * [CMake](https://cmake.org/download/)
 * [World Trading Data API](https://www.worldtradingdata.com/)
@@ -25,12 +26,6 @@ bash build.sh
 ```
 To run the program after building the project, run the following command in terminal:
 
-__Windows__
-```bash
-.\build\StockWatch.exe
-```
-
-__Linux/MacOS__
 ```bash
 ./build/StockWatch.exe
 ```
@@ -59,4 +54,3 @@ __Linux/MacOS__
 ```
 
 The two examples above are equivalent
-(and for Windows, you would replace the '/'s with '\\'s).

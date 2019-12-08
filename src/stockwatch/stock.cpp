@@ -1,5 +1,7 @@
 #include <stockwatch/stock.hpp>
 
+const char* kDatafilesDirPath = "./datafiles/";
+
 /**
  * Constructor for Stock class.
  * @param symbol  the symbol of the stock 

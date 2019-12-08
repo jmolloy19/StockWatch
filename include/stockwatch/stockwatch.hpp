@@ -5,8 +5,9 @@
 #include <stockwatch/options.hpp>
 #include <stockwatch/stock.hpp>
 
-const char* kStockListFilePath = "./stocklist.csv";
-const int MAX_THREADS = 10;
+#define MAX_THREADS  10
+
+extern const char* kStockListFilePath;
 
 class StockWatch
 {
