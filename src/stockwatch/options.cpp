@@ -1,56 +1,45 @@
-#include <utility/options.hpp>
+#include <stockwatch/options.hpp>
 
 /**
- *  Constructor for Options class.
+ * Constructor for Options class.
  * @param argc      command line argument count
  * @param argv[]    array of command line arguments
  */
-Options::Options(int argc, char* argv[]) : argc_(argc)
-{
-    for(int i = 0; i < argc; i++)
-    {
-        argv_.push_back(argv[i]);
-    }
-}
-
-/**
- * Function that parses command line arguments for program options.
- */
-void Options::Parse()
+Options::Options(int argc, char* argv[])
 {
     bool invalid = false;
     bool help = false;
     int invalidIdx;
 
-    for(int i = 1; i < argc_ && !help && !invalid; i++)
+    for(int i = 1; i < argc && !help && !invalid; i++)
     {
-        if(strlen(argv_[i]) < 2)
+        if(strlen(argv[i]) < 2)
         {
             invalid = true;
             invalidIdx = i;
             break;
         }
 
-        if(strncmp(argv_[i], "-", 1) == 0 && strncmp(argv_[i], "--", 2) != 0)
+        if(strncmp(argv[i], "-", 1) == 0 && strncmp(argv[i], "--", 2) != 0)
         {
-            for(size_t c = 1; c < strlen(argv_[i]); c++)
+            for(size_t c = 1; c < strlen(argv[i]); c++)
             {
-                if(argv_[i][c] == 'n')
+                if(argv[i][c] == 'n')
                 {
                     include_nyse_ = true;
                     continue;
                 }
-                else if(argv_[i][c] == 'r')
+                else if(argv[i][c] == 'r')
                 {
                     read_from_file_ = true;
                     continue;
                 }
-                else if(argv_[i][c] == 'w')
+                else if(argv[i][c] == 'w')
                 {
                     write_to_file_ = true;
                     continue;
                 }
-                else if(argv_[i][c] == 'h')
+                else if(argv[i][c] == 'h')
                 {
                     help = true;
                     break;
@@ -65,22 +54,22 @@ void Options::Parse()
         }
         else
         {
-            if(strcmp(argv_[i], "--nyse") == 0)
+            if(strcmp(argv[i], "--nyse") == 0)
             {
                 include_nyse_ = true;
                 continue;
             }
-            else if(strcmp(argv_[i], "--read-file") == 0)
+            else if(strcmp(argv[i], "--read-file") == 0)
             {
                 read_from_file_ = true;
                 continue;
             }
-            else if(strcmp(argv_[i], "--write-file") == 0)
+            else if(strcmp(argv[i], "--write-file") == 0)
             {
                 write_to_file_ = true;
                 continue;
             }
-            else if(strcmp(argv_[i], "--help") == 0)
+            else if(strcmp(argv[i], "--help") == 0)
             {
                 help = true;
                 break;      
@@ -96,7 +85,7 @@ void Options::Parse()
 
     if(invalid)
     {
-        std::cerr << "\nInvalid Option: " << '\'' << argv_[invalidIdx] << "\'\n";
+        std::cerr << "\nInvalid Option: " << '\'' << argv[invalidIdx] << "\'\n";
     }
 
     if(help || invalid)
@@ -150,17 +139,22 @@ bool Options::WriteToFile() const
  */
 void Options::DisplayManual()
 {
-    std::cout << "\nUsage: ./build/StockWatch [OPTIONS...]\n\n"
+    std::cout << "\nUsage: ./build/StockWatch.exe [OPTIONS...]\n\n"
               << "Options:\n"
               << "  -h, --help          Display usage manual.\n"
               << "  -n, --nyse          Also scans all stocks on the NYSE.\n"
               << "                      (Only scans NASDAQ by default)\n"
-              << "  -w, --write-file    Writes historical data of each stock to\n"
-              << "                      a .csv file. Files are stored in directory\n"
-              << "                      ./datafiles (which will be created if\n"
-              << "                      it doesn't exist already).\n"
-              << "  -r, --read-file     Reads historical data from files in\n"
-              << "                      datafiles directory instead of making API\n"
-              << "                      calls. Can only use this option if\n"
-              << "                      previously ran with \'--write-file\'.\n\n";
+              << "  -w, --write-file    Writes a list of all stocks to the file\n" 
+              << "                      \'stocklist.csv\'. Also Writes the historical\n"
+              << "                      data of each stock to a .csv file. These\n"
+              << "                      historcial data files are named according to\n" 
+              << "                      each stock's corresponding symbol and stored\n" 
+              << "                      in the directory \'datafiles\' (which will be\n" 
+              << "                      created if it does not existalready).\n"
+              << "  -r, --read-file     Reads files instead of making API calls.\n"
+              << "                      It reads the list of stocks from the file\n"
+              << "                      \'stocklist.csv\', and reads the historical\n"
+              << "                      data of each stock from their corresponding\n"
+              << "                      .csv file. This option can only be used if\n"
+              << "                      previously ran with the \'--write-file\' option.\n";
 }

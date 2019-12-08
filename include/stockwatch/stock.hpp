@@ -1,16 +1,11 @@
 #pragma once
 #include <vector>
 #include <algorithm>
+#include <utility/files.hpp>
+#include <utility/http_request.hpp>
 #include <stockwatch/world_trading_api.hpp>
-#include <utility/utility.hpp>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-// --Windows--
-const std::string kDataFilesPath = ".\\datafiles\\"; 
-#else
-// --Linux/MacOS--
-const std::string kDataFilesPath = "./datafiles/";
-#endif
+const char* kDatafilesDirPath = "./datafiles/";
 
 class Stock
 {
@@ -18,16 +13,18 @@ class Stock
 		Stock() = delete;
 		Stock(const Stock& s) = delete;
 		Stock& operator=(const Stock &) = delete;
-        Stock(const std::string& symbol);
+        Stock(const std::string& stock_symbol, bool read_file = false, bool write_file = false);
 		Stock(Stock &&) = default;
 		bool ExhibitsHighTightFlag();
-		void GetHistoricalData(bool read_from_file = false, bool write_to_file = false);
 		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
 	private:
-		void ParseHistoricalData(const std::string& historical_data);
+		void Init();
+		void GetHistoricalData(std::string* data_buffer);
+		void ParseHistoricalData(const std::string& data_buffer);
+		bool read_file_;
+		bool write_file_;
 		std::vector<double> closes_;
 		std::vector<int> volumes_;
-        std::string stock_name_;
-		int num_trading_days_;
-		File datafile_;
+        std::string symbol_;
+		int num_trading_days_ = 0;
 };

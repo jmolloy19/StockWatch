@@ -1,36 +1,32 @@
 #pragma once
 #include <thread>
-#include <utility/file.hpp>
-#include <utility/options.hpp>
-#include <stockwatch/world_trading_api.hpp>
+#include <mutex>
+#include <utility/progress_bar.hpp>
+#include <stockwatch/options.hpp>
 #include <stockwatch/stock.hpp>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
-// --Windows--
-const std::string kStockListFilePath = ".\\"; 
-#else
-// --Linux/MacOS--
-const std::string kStockListFilePath = "./";
-#endif
-
+const char* kStockListFilePath = "./stocklist.csv";
 const int MAX_THREADS = 10;
 
 class StockWatch
 {
     public:
         StockWatch() = delete;
+        StockWatch(const StockWatch& s) = delete;
+		StockWatch& operator=(const StockWatch &) = delete;
         StockWatch(int argc, char* argv[]);
         void Run();
-        void Init();
-        friend std::ostream& operator << (std::ostream& out, const StockWatch& stocks);
+        void PrintStockList();
     private:
+        void Init();
         void CheckStock(const std::string& stock_symbol);
-        void GetStockSymbols(std::string* symbols_buffer);
-        void ParseStockSymbols(const std::string& symbols_buffer);
-        bool IsValidStockSymbol(const std::string& symbol);
+        void GetStockList(std::string* symbols_buffer);
+        void ParseStockList(const std::string& symbols_buffer);
+        bool IsValidStock(const std::string& stock_symbol);
         void PrintReport();
-        std::vector<std::string> stock_symbols_;
+        int num_stocks_ = 0;
+        std::vector<std::string> stocks_;
         std::vector<std::string> high_tight_flags_;
-        Options program_options_;
-        File stocklist_file_;
+        std::mutex mtx_;
+        Options options_;
 };

@@ -5,8 +5,7 @@ set(CMAKE_CXX_FLAGS "-std=c++14")
 project(StockWatch)
 
 add_library(utility STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/options.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/files.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/progress_bar.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/http_request.cpp
 )

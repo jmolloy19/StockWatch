@@ -5,7 +5,7 @@
  * @param service        enum value specifying the type of API call
  * @param stock_symbol   symbol of stock (not required for ticker api calls)
  */
-std::string CreateApiCall(API service, const std::string& stock_symbol)
+std::string CreateUrl(API service, const std::string& stock_symbol)
 {
     const std::string url_base = "https://api.worldtradingdata.com/api/v1/";
     const std::string api_token = "&api_token=" + API_KEY;
