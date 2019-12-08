@@ -65,7 +65,7 @@ void Stock::Init()
 }
 
 /**
- * Gets the historical data of the stock. If read_from_file is true, it reads the historical data 
+ * Gets the historical data of the stock. If read_file is true, it reads the historical data 
  * from the corresponding file in the 'datafiles' directory. Else, it makes an API call for the data
  * @param read_from_file 	if true, reads historical data from file 
  * @param write_to_file		if true, writes historical data to file
