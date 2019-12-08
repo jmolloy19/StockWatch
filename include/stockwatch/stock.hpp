@@ -1,7 +1,16 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-#include <stockwatch/get_historical_data.hpp>
+#include <stockwatch/world_trading_api.hpp>
+#include <utility/utility.hpp>
+
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32) && !defined(__CYGWIN__)
+// --Windows--
+const std::string kDataFilesPath = ".\\datafiles\\"; 
+#else
+// --Linux/MacOS--
+const std::string kDataFilesPath = "./datafiles/";
+#endif
 
 class Stock
 {
@@ -11,20 +20,14 @@ class Stock
 		Stock& operator=(const Stock &) = delete;
         Stock(const std::string& symbol);
 		Stock(Stock &&) = default;
-		void Analyze(const Options& options);
-		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
-		//friend void GetBadTickers(std::string* tickers);
-		//friend void GetHighTightFlags(std::vector<std::string>* high_tight_flags);
-		static std::vector<std::string> high_tight_flags_;
-	private:
-		void InputHistoricalData(const std::string& historical_data);
 		bool ExhibitsHighTightFlag();
+		void GetHistoricalData(bool read_from_file = false, bool write_to_file = false);
+		friend std::ostream& operator << (std::ostream& out, const Stock& stock);
+	private:
+		void ParseHistoricalData(const std::string& historical_data);
 		std::vector<double> closes_;
 		std::vector<int> volumes_;
         std::string stock_name_;
-		int number_of_days_;
-		static std::string bad_tickers_;
+		int num_trading_days_;
+		File datafile_;
 };
-
-//extern void GetBadTickers(std::string* tickers);
-//extern void GetHighTightFlags(std::vector<std::string>* high_tight_flags);

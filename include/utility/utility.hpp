@@ -1,5 +1,5 @@
 #pragma once
-#include <utility/directory.hpp>
+#include <utility/file.hpp>
+#include <utility/http_request.hpp>
 #include <utility/options.hpp>
-#include <utility/files.hpp>
-#include <utility/manual.hpp>
+#include <utility/progress_bar.hpp>

@@ -27,12 +27,12 @@ To run the program after building the project, run the following command in term
 
 __Windows__
 ```bash
-.\build\AnalyzeStocks
+.\build\StockWatch.exe
 ```
 
 __Linux/MacOS__
 ```bash
-./build/AnalyzeStocks
+./build/StockWatch.exe
 ```
 
 ### Options
@@ -51,11 +51,11 @@ __Linux/MacOS__
 ### Usage Examples
 
 ```bash
-./build/AnalyzeStocks --nyse --write-file
+./build/StockWatch.exe --nyse --write-file
 ```
 
 ```bash
-./build/AnalyzeStocks -nw
+./build/StockWatch.exe -nw
 ```
 
 The two examples above are equivalent

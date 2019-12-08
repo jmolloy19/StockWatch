@@ -6,10 +6,13 @@ project(StockWatch)
 
 add_library(utility STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/options.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/files.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/directory.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/manual.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/file.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/progress_bar.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/http_request.cpp
+)
+
+target_link_libraries(utility PUBLIC
+    -lcurl
 )
 
 target_include_directories(utility PUBLIC

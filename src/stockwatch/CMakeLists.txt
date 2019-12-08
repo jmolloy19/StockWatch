@@ -9,14 +9,11 @@ set(STOCKWATCH_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
 
 add_library(stockwatch STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/stock.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/api.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/get_historical_data.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/get_stock_symbols.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/analyze_stocks.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/stockwatch.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/world_trading_api.cpp
 )
 
 target_link_libraries(stockwatch PUBLIC
-    -lcurl
     -lpthread
     utility
 )

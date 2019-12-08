@@ -1,10 +1,8 @@
-#include <stockwatch/stockwatch.hpp>
+#include <stockwatch/stock.hpp>
 
-int main(int argc, char* argv[])
+int main()
 {
-    Options options(argc, argv);
-    std::string historical_data;
-    
-    GetHistoricalData("AAPL", &historical_data, options);
-    std::cout << historical_data;
-}
+    Stock stock("AAPL");
+    stock.GetHistoricalData();
+    std::cout << stock;
+}   

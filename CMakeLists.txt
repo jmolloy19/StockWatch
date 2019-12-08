@@ -9,14 +9,14 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/stockwatch)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 
-add_executable(AnalyzeStocks
+add_executable(StockWatch.exe
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 )
 
-target_link_libraries(AnalyzeStocks
+target_link_libraries(StockWatch.exe
     stockwatch
 )
 
-target_include_directories(AnalyzeStocks PUBLIC
+target_include_directories(StockWatch.exe PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
