@@ -21,7 +21,11 @@ You will need to insert your World Trading Data API key into the file
 ```bash
 Your API Key: 667myExampleApiKey99099IAmAPoorBoyToo77
 ```
-Using the API Key above as an example, I would insert it into the file like so.
+Using the API Key above as an example, I would change
+```cpp
+const std::string API_KEY = "Insert_Your_API_Key_Here";
+``` 
+To
 ```cpp
 const std::string API_KEY = "667myExampleApiKey99099IAmAPoorBoyToo77";
 ``` 
