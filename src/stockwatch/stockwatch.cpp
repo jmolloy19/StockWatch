@@ -17,8 +17,6 @@ StockWatch::StockWatch(int argc, char* argv[]) :
  */
 void StockWatch::Run()
 {
-    GetStockSymbols();
-
     std::vector<std::thread> threads;
     threads.reserve(MAX_THREADS);
 
@@ -45,8 +43,18 @@ void StockWatch::Run()
 }
 
 /**
- * Initializes Stock object and pushes the symbol into the vector high_tight_flags_
- * if it exhibits the pattern.
+ * Initializes the StockWatch object. Must be called before Run().
+ */
+void StockWatch::Init()
+{
+    std::string symbols_buffer;
+    GetStockSymbols(&symbols_buffer);
+    ParseStockSymbols(symbols_buffer);
+}
+
+/**
+ * Initializes Stock object, and pushes the stock's symbol into the vector high_tight_flags_ 
+ * it it exhibits the pattern.
  * @param stock_symbol  name of the stock to check
  */
 void StockWatch::CheckStock(const std::string& stock_symbol)
@@ -61,38 +69,36 @@ void StockWatch::CheckStock(const std::string& stock_symbol)
 }
 
 /**
- * Gets the symbols of every stock and parses for the ones to be analyzed.
- * It will also read and write the stock symbols to the file './stocklistfile.csv'
- * if the read or write program_options_ are true.
+ * If the read from file option is given, it will read the stock symbol data from
+ * the file './stocklist.csv'. Else is will make a HTTP request for the data.
+ * The data will be written to the string 'symbols_buffer', and if the write to file
+ * option is given, it will also write this string to './stocklistfile.csv'.
+ * @param symbols_buffer   string that data will be written to
  */
-void StockWatch::GetStockSymbols()
+void StockWatch::GetStockSymbols(std::string* symbols_buffer)
 {
-    std::string symbols_buffer;
-
     if(program_options_.ReadFromFile())
     {
-        stocklist_file_.Read(&symbols_buffer);
+        stocklist_file_.Read(symbols_buffer);
     }
     else
     {
         CheckApiKey();
         std::string url = CreateApiCall(API::SymbolList);
-	    MakeHttpRequest(url, &symbols_buffer);
-        CheckApiResponse(symbols_buffer);
+	    MakeHttpRequest(url, symbols_buffer);
+        CheckApiResponse(*symbols_buffer);
 
         if(program_options_.WriteToFile())
 		{
-			stocklist_file_.Write(symbols_buffer);
+			stocklist_file_.Write(*symbols_buffer);
 		}
     }
-
-    ParseStockSymbols(symbols_buffer);
 }
 
 /**
- * Parses a string for stock symbols, and pushes each valid symbol into stock_symbols_.
- * If the include NYSE program_option_ is true, it will include stocks from the NYSE.
- * Else it will only push symbols on the NASDAQ.
+ * Parses a string for stock symbols, and pushes each valid symbol into the vector
+ * 'stock_symbols_'. If the include NYSE program option is given, it will include stocks
+ * from the NYSE. Else it will only push symbols on the NASDAQ.
  * @param symbols_buffer 	string to parse for symbols
  */
 void StockWatch::ParseStockSymbols(const std::string& symbols_buffer)
@@ -161,4 +167,17 @@ void StockWatch::PrintReport()
         }
         std::cout << high_tight_flags_[i] << ", ";
     }
+}
+
+/**
+ * Overloaded << operator to display StockWatch objects
+ */ 
+std::ostream& operator << (std::ostream& out,  const StockWatch& stocks)
+{
+	for(int i = 0; i < stocks.stock_symbols_.size(); i++)
+	{
+		out << stocks.stock_symbols_[i] << "\n";
+	}
+	out << "Number of Stocks to Analyze = " << stocks.stock_symbols_.size() << "\n";
+    return out;
 }

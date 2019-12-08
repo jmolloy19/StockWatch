@@ -21,9 +21,11 @@ class StockWatch
         StockWatch() = delete;
         StockWatch(int argc, char* argv[]);
         void Run();
-        void GetStockSymbols();
+        void Init();
+        friend std::ostream& operator << (std::ostream& out, const StockWatch& stocks);
     private:
         void CheckStock(const std::string& stock_symbol);
+        void GetStockSymbols(std::string* symbols_buffer);
         void ParseStockSymbols(const std::string& symbols_buffer);
         bool IsValidStockSymbol(const std::string& symbol);
         void PrintReport();
