@@ -9,23 +9,23 @@ This project requires:
 * [curl](https://curl.haxx.se/download.html)
 * [CMake](https://cmake.org/download/)
 * [World Trading Data API](https://www.worldtradingdata.com/)
+
 Note: World Trading Data offers a free API key however it only allows 250 requests/day. 
       The 8 dollars a month API key allows 5000 requests/day, which easily covers all of the NASDAQ and most of the NYSE.
 
-###Inserting API Key
+### Inserting API Key
+
 You will need to insert your World Trading Data API key into the file
 [world_trading_api.hpp](https://github.com/jmolloy19/StockWatch/blob/master/include/stockwatch/world_trading_api.hpp)
-        
-```bash
-667myExampleApiKey99099IAmAPoorBoyToo
-``` 
-Using the example API key above, I would change...
+  
+
+Using **667myExampleApiKey99099IAmAPoorBoyToo77** as my example API Key.I would change...
 ```cpp
 const std::string API_KEY = "Insert_Your_API_Key_Here";
 ``` 
 To
 ```cpp
-const std::string API_KEY = "667myExampleApiKey99099IAmAPoorBoyToo";
+const std::string API_KEY = "667myExampleApiKey99099IAmAPoorBoyToo77";
 ``` 
 
 ## Usage
