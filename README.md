@@ -47,18 +47,18 @@ To run the program after building the project, run the following command in term
 ```
 -h, --help          Display usage manual.
 
--n, --nyse          Also scans all stocks on the NYSE. (Only scans NASDAQ by default)
+-n, --nyse          Also scan all stocks on the NYSE. (Only scans NASDAQ by default)
 
 -w, --write-file    Writes a list of all stocks to the file 'stocklist.csv'. Also
                     writes the historical data of each stock to a .csv file. These
                     historcial data files are named according to each stock's corresponding
-                    symbol and stored n the directory 'datafiles' (which will be
+                    symbol and stored in the directory 'datafiles' (which will be
                     created if it does not exist already).
-                    
--r, --read-file     Reads files instead of making API calls. It reads the list of stocks
-                    from the file 'stocklist.csv', and reads the historical data of each
-                    stock from their corresponding .csv file. This option can only be used
-                    if previously ran with the '--write-file' option.
+
+-r, --read-file     Reads data from files instead of making API calls. It reads the list of
+                    stocks from the file 'stocklist.csv', and reads the historical data of
+                    each stock from their corresponding .csv file. This option can only be
+                    used if previously ran with the '--write-file' option.
 
 ```
 ### Usage Examples
