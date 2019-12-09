@@ -2,6 +2,5 @@
 
 int main(int argc, char* argv[])
 {
-    StockWatch program(argc, argv);
-    program.Run();
-}
+    Stock stock("AAPL", false, true);
+}   

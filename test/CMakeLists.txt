@@ -14,6 +14,18 @@ add_executable(GetHistoricalDataTest
     ${CMAKE_CURRENT_SOURCE_DIR}/test_get_historical_data.cpp
 )
 
-add_executable(GetStockSymbolsTest
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_get_stock_symbols.cpp
+add_executable(GetStockListTest
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_get_stock_list.cpp
+)
+
+add_executable(ReadFromFileTest
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_read_from_file.cpp
+)
+
+add_executable(WriteToFileTest
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_write_to_file.cpp
+)
+
+add_executable(OptionsParserTest
+    ${CMAKE_CURRENT_SOURCE_DIR}/test_options_parser.cpp
 )

@@ -1,7 +1,5 @@
 #include <stockwatch/stockwatch.hpp>
 
-const char* kStockListFilePath = "./stocklist.csv";
-
 /**
  * Constructor for Stock class.
  * @param argc      command line argument count
@@ -11,6 +9,7 @@ StockWatch::StockWatch(int argc, char* argv[]) :
     options_(Options(argc, argv))
 {
     Init();
+    high_tight_flags_.reserve(num_stocks_);
 }
 
 /**
@@ -28,7 +27,7 @@ void StockWatch::Run()
     {
         for(int thr = 0; thr < MAX_THREADS && i < num_stocks_; thr++, i++)
         {
-            threads.emplace_back(&StockWatch::CheckStock, this, stocks_[i + thr]);    
+            threads.emplace_back(&StockWatch::CheckStock, this, stocks_[thr]);    
         }
 
         for(int thr = 0; thr < threads.size(); thr++)
@@ -56,7 +55,7 @@ void StockWatch::Init()
 
     num_stocks_ = stocks_.size();
 
-    std::cout << "Retrieved " << stocks_.size() << " Stocks to Analyze\n\n";
+    std::cout << "Retrieved " << num_stocks_ << " Stocks to Analyze\n\n";
 }
 
 /**
@@ -66,7 +65,7 @@ void StockWatch::Init()
  */
 void StockWatch::CheckStock(const std::string& stock_symbol)
 {
-    Stock stock(stock_symbol, options_.ReadFromFile(), options_.WriteToFile());
+    Stock stock(stock_symbol, false, true);//options_.ReadFromFile(), options_.WriteToFile());
 
     if(stock.ExhibitsHighTightFlag())
     {
@@ -80,14 +79,14 @@ void StockWatch::CheckStock(const std::string& stock_symbol)
  * If the read from file option is given, it will read the stock symbol data from
  * the file './stocklist.csv'. Else is will make a HTTP request for the data.
  * The data will be written to the string 'symbols_buffer', and if the write to file
- * option is given, it will also write this string to './stocklistfile.csv'.
+ * option is given, it will also write this string to './stocklist.csv'.
  * @param symbols_buffer   string that data will be written to
  */
 void StockWatch::GetStockList(std::string* symbols_buffer)
 {
     if(options_.ReadFromFile())
     {
-        ReadFromFile(kStockListFilePath ,symbols_buffer);
+        ReadFromFile("./stocklist.csv", symbols_buffer);
     }
     else
     {
@@ -98,7 +97,7 @@ void StockWatch::GetStockList(std::string* symbols_buffer)
 
         if(options_.WriteToFile())
 		{
-			WriteToFile(kStockListFilePath, *symbols_buffer);
+			WriteToFile("./stocklist.csv", *symbols_buffer);
 		}
     }
 }
@@ -171,6 +170,9 @@ void StockWatch::PrintStockList()
 		std::cout << stocks_[i] << "\n";
 	}
     std::cout << "\nNumber of Stocks = " << stocks_.size() << "\n";
+    std::cout << "NYSE = " << options_.IncludeNYSE() << "\n";
+    std::cout << "READ = " << options_.ReadFromFile() << "\n";
+    std::cout << "WRITE = " << options_.WriteToFile() << "\n";
 }
 
 /**
@@ -179,6 +181,7 @@ void StockWatch::PrintStockList()
 void StockWatch::PrintReport()
 {
     std::cout << "--Stocks That Exhibit Pattern--";
+
     for(int i = 0; i < high_tight_flags_.size(); i++)
     {
         if(i % 5 == 0)

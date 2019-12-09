@@ -5,8 +5,6 @@
 #include <utility/http_request.hpp>
 #include <stockwatch/world_trading_api.hpp>
 
-extern const char* kDatafilesDirPath;
-
 class Stock
 {
 	public:

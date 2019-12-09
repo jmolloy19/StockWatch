@@ -7,8 +7,6 @@
 
 #define MAX_THREADS  10
 
-extern const char* kStockListFilePath;
-
 class StockWatch
 {
     public:

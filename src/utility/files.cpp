@@ -5,7 +5,7 @@
  * @param file_path     path of file to read from
  * @param read_buffer   string that will be written to
  */
-void ReadFromFile(const char* file_path, std::string* read_buffer)
+void ReadFromFile(const std::string& file_path, std::string* read_buffer)
 {
     std::ifstream in_file(file_path);
     if(in_file.is_open())
@@ -27,13 +27,14 @@ void ReadFromFile(const char* file_path, std::string* read_buffer)
  * @param write_buffer  string that will be written to file
  * @param open_mode     the openmode of the file to be written to. Defaults to trunc
  */
-void WriteToFile(const char* file_path, const std::string& write_buffer, std::ios::openmode open_mode)
+void WriteToFile(const std::string& file_path, const std::string& write_buffer, std::ios::openmode open_mode)
 {
-    char* unconst_file_path = new char[sizeof(file_path)];
-    std::strncpy(unconst_file_path, file_path, sizeof(file_path));
-
-    const char* dir_path = dirname(unconst_file_path);
-    const char* file_name = basename(unconst_file_path);
+    std::string dir_path;
+    const size_t last_slash_idx = file_path.rfind('/');
+    if (std::string::npos != last_slash_idx)
+    {
+        dir_path = file_path.substr(0, last_slash_idx);
+    }
 
     if(!DirectoryExists(dir_path))
     {
@@ -56,17 +57,15 @@ void WriteToFile(const char* file_path, const std::string& write_buffer, std::io
         std::cerr << "Could not open file for writing: " << file_path << "\n";
         exit(-1);
     }
-
-    delete[] unconst_file_path;
 }
 
 /**
  * Returns true if the directory was successfully created.
  * @param dir_path  dirctory path
  */
-bool CreateDirectory(const char* dir_path)
+bool CreateDirectory(const std::string& dir_path)
 {
-    if(mkdir(dir_path, ACCESSPERMS) == 0)
+    if(mkdir(dir_path.c_str(), ACCESSPERMS) == 0)
     {
         return true;
     }
@@ -80,10 +79,10 @@ bool CreateDirectory(const char* dir_path)
  * Returns true if the directory exists.
  * @param dir_path  directory path
  */
-bool DirectoryExists(const char* dir_path)
+bool DirectoryExists(const std::string& dir_path)
 {
     struct stat buffer;
-    if(stat(dir_path, &buffer) == 0)
+    if(stat(dir_path.c_str(), &buffer) == 0)
     {
         return true;
     }

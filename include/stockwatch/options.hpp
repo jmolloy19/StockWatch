@@ -8,7 +8,6 @@ class Options
     public:
         Options() = delete;
         Options(int argc, char* argv[]);
-        void Set(bool nyse, bool read, bool write);
         bool IncludeNYSE() const;
         bool ReadFromFile() const;
         bool WriteToFile() const;

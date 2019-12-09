@@ -1,7 +1,5 @@
 #include <stockwatch/stock.hpp>
 
-const char* kDatafilesDirPath = "./datafiles/";
-
 /**
  * Constructor for Stock class.
  * @param symbol  the symbol of the stock 
@@ -55,7 +53,7 @@ bool Stock::ExhibitsHighTightFlag()
 }
 
 /**
- * initializes Stock object.
+ * Initializes Stock object.
  */
 void Stock::Init()
 {
@@ -72,11 +70,11 @@ void Stock::Init()
  */
 void Stock::GetHistoricalData(std::string* data_buffer)
 {
-	std::string file_path = kDatafilesDirPath + symbol_ + ".csv";
+	std::string file_path = "./datafiles/" + symbol_ + ".csv";
 	
 	if(read_file_)
 	{
-		ReadFromFile(file_path.c_str(), data_buffer);
+		ReadFromFile(file_path, data_buffer);
 	}
 	else
 	{
@@ -85,11 +83,9 @@ void Stock::GetHistoricalData(std::string* data_buffer)
 
 		if(write_file_)
 		{
-			WriteToFile(file_path.c_str(), *data_buffer);
+			WriteToFile(file_path, *data_buffer);
 		}
 	}
-
-	ParseHistoricalData(*data_buffer);
 }
 
 /**

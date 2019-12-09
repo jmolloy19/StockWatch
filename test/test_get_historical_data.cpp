@@ -2,7 +2,6 @@
 
 int main()
 {
-    Stock stock("AAPL");
-    stock.GetHistoricalData();
+    Stock stock("ABAC", true);
     std::cout << stock;
 }   

@@ -7,9 +7,9 @@
  */
 Options::Options(int argc, char* argv[])
 {
-    bool invalid = false;
-    bool help = false;
     int invalidIdx;
+    bool invalid = false;
+    bool help    = false;
 
     for(int i = 1; i < argc && !help && !invalid; i++)
     {
@@ -101,16 +101,6 @@ Options::Options(int argc, char* argv[])
 }
 
 /**
- * Setter function to set options
- */
-void Options::Set(bool nyse, bool read, bool write)
-{
-    include_nyse_ = nyse;
-    read_from_file_ = read;
-    write_to_file_ = write;
-}
-
-/**
  * Returns option signifying whether to also analyze stocks from the NYSE
  */
 bool Options::IncludeNYSE() const
@@ -119,7 +109,7 @@ bool Options::IncludeNYSE() const
 }
 
 /**
- * Returns option signifying whether to read historical data from files
+ * Returns option signifying whether to read data from files
  */
 bool Options::ReadFromFile() const
 {
@@ -127,7 +117,7 @@ bool Options::ReadFromFile() const
 }
 
 /**
- * Returns option signifying whether to write historical data to files
+ * Returns option signifying whether to write data to files
  */
 bool Options::WriteToFile() const
 {
@@ -142,19 +132,22 @@ void Options::DisplayManual()
     std::cout << "\nUsage: ./build/StockWatch.exe [OPTIONS...]\n\n"
               << "Options:\n"
               << "  -h, --help          Display usage manual.\n"
-              << "  -n, --nyse          Also scans all stocks on the NYSE.\n"
-              << "                      (Only scans NASDAQ by default)\n"
+              << "                      \n"
+              << "  -n, --nyse          Also scans all stocks on the NYSE. Only\n"
+              << "                      scans NASDAQ by default.\n"
+              << "                      \n"
               << "  -w, --write-file    Writes a list of all stocks to the file\n" 
               << "                      \'stocklist.csv\'. Also Writes the historical\n"
               << "                      data of each stock to a .csv file. These\n"
               << "                      historcial data files are named according to\n" 
               << "                      each stock's corresponding symbol and stored\n" 
               << "                      in the directory \'datafiles\' (which will be\n" 
-              << "                      created if it does not existalready).\n"
+              << "                      created if it does not exist already).\n"
+              << "                      \n"
               << "  -r, --read-file     Reads files instead of making API calls.\n"
               << "                      It reads the list of stocks from the file\n"
               << "                      \'stocklist.csv\', and reads the historical\n"
               << "                      data of each stock from their corresponding\n"
               << "                      .csv file. This option can only be used if\n"
-              << "                      previously ran with the \'--write-file\' option.\n";
+              << "                      previously ran with the \'--write-file\' option.\n\n";
 }

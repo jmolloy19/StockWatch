@@ -2,9 +2,10 @@
 
 void DisplayProgressBar(int complete, int total_amount)
 {
-    double decimal_done = ((double)complete / (double)total_amount);
-    double percent_done = decimal_done * 100.0;
-    uint num_bars_to_print = decimal_done * 40;
+    double fraction_done = ((double)complete / (double)total_amount);
+    double percent_done = fraction_done * 100.0;
+    
+    uint num_bars_to_print = fraction_done * 40;
     uint num_spaces_to_print = 40 - num_bars_to_print;
 
     std::string bars(num_bars_to_print, '=');
