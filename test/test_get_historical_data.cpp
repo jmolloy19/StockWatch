@@ -2,6 +2,6 @@
 
 int main()
 {
-    Stock stock("ABAC", true);
+    Stock stock("AAPL");
     std::cout << stock;
 }   

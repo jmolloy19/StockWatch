@@ -5,7 +5,7 @@
  * @param service        enum value specifying the type of API call
  * @param stock_symbol   symbol of stock (not required for ticker api calls)
  */
-std::string CreateUrl(API service, const std::string& stock_symbol)
+std::string CreateUrlForRequest(API service, const std::string& stock_symbol)
 {
     const std::string url_base = "https://api.worldtradingdata.com/api/v1/";
     const std::string api_token = "&api_token=" + API_KEY;
@@ -23,21 +23,12 @@ std::string CreateUrl(API service, const std::string& stock_symbol)
     } 
 }
 
-void CheckApiKey()
-{
-    if(API_KEY == "Insert_Your_API_Key_Here")
-	{
-		std::cerr << "Please aquire an API key from https://www.worldtradingdata.com\n"
-				  << "Then enter your API key in the file Stockwatch/include/stockwatch/api.hpp\n"
-				  << "Instructions and examples for inserting your API Key are in the README.md\n";
-		exit(-1);
-	}
-}
-
-void CheckApiResponse(const std::string& response)
+void CheckResponse(const std::string& response)
 {
     std::string invalid_api_key_response = "{\"message\":\"Invalid API Key.\"}";
     std::string beginning(response, 0, 40);
+
+    CheckApiKeyChanged();
 
     if(beginning.find(invalid_api_key_response) != std::string::npos)
     {
@@ -45,7 +36,18 @@ void CheckApiResponse(const std::string& response)
 				  << "Please check to make sure you inserted it correctly.\n"
                   << "Instructions and examples for inserting your API Key are in the README.md\n"
                   << "You can find your API key by logging into your account at " 
-                  << "https://www.worldtradingdata.com\n";
+                  << "https://www.worldtradingdata.com\n\n";
 		exit(-1);
     }
+}
+
+void CheckApiKeyChanged()
+{
+    if(API_KEY == "Insert_Your_API_Key_Here")
+	{
+		std::cerr << "Please aquire an API key from https://www.worldtradingdata.com\n"
+				  << "Then enter your API key in the file Stockwatch/include/stockwatch/world_trading_api.hpp\n"
+				  << "Instructions and examples for inserting your API Key are in the README.md\n\n";
+		exit(-1);
+	}
 }

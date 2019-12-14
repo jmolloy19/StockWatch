@@ -19,8 +19,8 @@ class StockWatch
     private:
         void Init();
         void CheckStock(const std::string& stock_symbol);
-        void GetStockList(std::string* symbols_buffer);
-        void ParseStockList(const std::string& symbols_buffer);
+        void GetStockList(std::string* stocklist_buffer);
+        void ParseStockList(const std::string& stocklist_buffer);
         bool IsValidStock(const std::string& stock_symbol);
         void PrintReport();
         int num_stocks_ = 0;

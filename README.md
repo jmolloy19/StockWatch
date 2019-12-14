@@ -21,7 +21,7 @@ You will need to insert your World Trading Data API key into the file
 ```
 Your Example API Key: 667myExampleApiKey99099IAmAPoorBoyToo77
 ```
-Using the API Key above as an example, I would change
+Using the example API Key above, I would change
 ```cpp
 const std::string API_KEY = "Insert_Your_API_Key_Here";
 ``` 
@@ -40,7 +40,7 @@ bash build.sh
 To run the program after building the project, run the following command in terminal:
 
 ```bash
-./build/StockWatch.exe
+./build/StockWatch
 ```
 
 ### Options
@@ -49,26 +49,27 @@ To run the program after building the project, run the following command in term
 
 -n, --nyse          Also scan all stocks on the NYSE. (Only scans NASDAQ by default)
 
--w, --write-file    Writes a list of all stocks to the file 'stocklist.csv'. Also
-                    writes the historical data of each stock to a .csv file. These
-                    historcial data files are named according to each stock's corresponding
-                    symbol and stored in the directory 'datafiles' (which will be
-                    created if it does not exist already).
+-w, --write-file    Writes the historical data of each stock to a .csv file. These historcial 
+                    data files are named according to each stock's corresponding symbol and are 
+                    stored in the directory 'datafiles' (which will be created if it does not 
+                    exist already).
 
--r, --read-file     Reads data from files instead of making API calls. It reads the list of
-                    stocks from the file 'stocklist.csv', and reads the historical data of
-                    each stock from their corresponding .csv file. This option can only be
-                    used if previously ran with the '--write-file' option.
+-r, --read-file     Reads the historical data of each stock from their corresponding .csv file 
+                    instead of making API calls. This option can only be used if previously ran 
+                    with the '--write-file' option.
+
+-u, --update-list   Updates the file 'stocklist.csv' by making an API call for the list of
+                    stocks, and writing a new file.
 
 ```
 ### Usage Examples
 
 ```bash
-./build/StockWatch.exe --nyse --write-file
+./build/StockWatch --nyse --write-file
 ```
 
 ```bash
-./build/StockWatch.exe -nw
+./build/StockWatch -nw
 ```
 
 The two examples above are equivalent

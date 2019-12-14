@@ -78,7 +78,7 @@ void Stock::GetHistoricalData(std::string* data_buffer)
 	}
 	else
 	{
-		std::string url = CreateUrl(API::HistoricalData, symbol_);
+		std::string url = CreateUrlForRequest(API::HistoricalData, symbol_);
 		MakeHttpRequest(url, data_buffer);
 
 		if(write_file_)
@@ -97,40 +97,38 @@ void Stock::ParseHistoricalData(const std::string& historical_data)
 {
     std::string csv_header = "Date,Open,Close,High,Low,Volume";
 
-	if(historical_data.find(csv_header) == -1)						// No header means we did not get historcial data
+	if(historical_data.find(csv_header) == std::string::npos)	 // No header means bad API call
 	{
 		return;
 	}
-	else	
-    {                                                        															       
-		std::string::const_iterator it,
-							        begin = historical_data.begin(), 
-							        end = historical_data.end();
-		
-		size_t found = 32;							                 // Skip header	    
+                                                       															       
+	std::string::const_iterator it,
+								begin = historical_data.begin(), 
+								end = historical_data.end();
 	
-        while(it != end)						                
-		{	
-            for(int i = 0; i < 2; i++)                               // Sets 'found' to comma before close value
-            {
-                found = historical_data.find(',', found + 1);  
-            }
-			if (found != std::string::npos)						     // Check we're not past last trading day entry
-			{
-				num_trading_days_++;							    
-				it = begin + found + 1; 					      	 // Sets 'it' to start of close value
-				std::string closeStr(it, std::find(it, end, ','));	 // Extract close value
-				closes_.push_back(std::stod(closeStr));
+	size_t found = 32;							                 // Skip header	    
 
-                for(int i = 0; i < 3; i++)                           // Set 'found' to comma before volume value
-                {
-                    found = historical_data.find(',', found + 1);  
-                }                  
-                it = begin + found + 1; 					      	 // Sets 'it' to start of volume value
-				std::string volumeStr(it, std::find(it, end, '\n')); // Extract volume value
-				volumes_.push_back(std::stoi(volumeStr));
-                it = std::find(it, end, ',');
-			}
+	while(it != end)						                
+	{	
+		for(int i = 0; i < 2; i++)                               // Find start of close value
+		{
+			found = historical_data.find(',', found + 1);  
+		}
+		if (found != std::string::npos)						     // Check we're not past last trading day entry
+		{
+			num_trading_days_++;							    
+			it = begin + found + 1; 					      	 // Sets 'it' to start of close value
+			std::string closeStr(it, std::find(it, end, ','));	 // Extract close value
+			closes_.push_back(std::stod(closeStr));
+
+			for(int i = 0; i < 3; i++)                           // Find start of volume value
+			{
+				found = historical_data.find(',', found + 1);  
+			}                  
+			it = begin + found + 1; 					      	 // Sets 'it' to start of volume value
+			std::string volumeStr(it, std::find(it, end, '\n')); // Extract volume value
+			volumes_.push_back(std::stoi(volumeStr));
+			it = std::find(it, end, ',');
 		}
 	}
 }

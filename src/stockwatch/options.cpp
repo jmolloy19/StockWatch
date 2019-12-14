@@ -39,6 +39,11 @@ Options::Options(int argc, char* argv[])
                     write_to_file_ = true;
                     continue;
                 }
+                 else if(argv[i][c] == 'u')
+                {
+                    update_list_ = true;
+                    continue;
+                }
                 else if(argv[i][c] == 'h')
                 {
                     help = true;
@@ -67,6 +72,11 @@ Options::Options(int argc, char* argv[])
             else if(strcmp(argv[i], "--write-file") == 0)
             {
                 write_to_file_ = true;
+                continue;
+            }
+            else if(strcmp(argv[i], "--update-list") == 0)
+            {
+                update_list_ = true;
                 continue;
             }
             else if(strcmp(argv[i], "--help") == 0)
@@ -125,6 +135,14 @@ bool Options::WriteToFile() const
 }
 
 /**
+ * Returns option signifying whether to create a new 'stocklist.csv' file
+ */
+bool Options::UpdateList() const
+{
+    return update_list_;
+}
+
+/**
  * Function to display usage manual.
  */
 void Options::DisplayManual()
@@ -136,18 +154,17 @@ void Options::DisplayManual()
               << "  -n, --nyse          Also scans all stocks on the NYSE. Only\n"
               << "                      scans NASDAQ by default.\n"
               << "                      \n"
-              << "  -w, --write-file    Writes a list of all stocks to the file\n" 
-              << "                      \'stocklist.csv\'. Also Writes the historical\n"
-              << "                      data of each stock to a .csv file. These\n"
-              << "                      historcial data files are named according to\n" 
-              << "                      each stock's corresponding symbol and stored\n" 
-              << "                      in the directory \'datafiles\' (which will be\n" 
-              << "                      created if it does not exist already).\n"
+              << "  -w, --write-file    Writes the historical data of each stock to a\n"
+              << "                      .csv file. These historcial data files are named\n" 
+              << "                      according to each stock's corresponding symbol and\n" 
+              << "                      are stored in the directory \'datafiles\' (which will\n" 
+              << "                      be created if it does not exist already).\n"
               << "                      \n"
-              << "  -r, --read-file     Reads files instead of making API calls.\n"
-              << "                      It reads the list of stocks from the file\n"
-              << "                      \'stocklist.csv\', and reads the historical\n"
-              << "                      data of each stock from their corresponding\n"
-              << "                      .csv file. This option can only be used if\n"
-              << "                      previously ran with the \'--write-file\' option.\n\n";
+              << "  -r, --read-file     Reads the historical data of each stock from their\n"
+              << "                      corresponding .csv file instead of making API calls.\n"
+              << "                      This option can only be used if previously ran with\n"
+              << "                      the \'--write-file\' option.\n"
+              << "                      \n"
+              << "  -u, --update-list   Updates the file \'stocklist.csv\' by making an API\n"
+              << "                      call for the list of stocks, and writing a new file.\n\n";
 }

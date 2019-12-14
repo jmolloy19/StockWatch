@@ -46,6 +46,11 @@ void WriteToFile(const std::string& file_path, const std::string& write_buffer, 
         }     
     }
 
+    if(FileExists(file_path))
+    {
+        std::remove(file_path.c_str());
+    }
+
     std::ofstream out_file(file_path, open_mode);
     if(out_file.is_open())
     {
@@ -77,17 +82,20 @@ bool CreateDirectory(const std::string& dir_path)
 
 /**
  * Returns true if the directory exists.
- * @param dir_path  directory path
+ * @param dir_path   path of directory
  */
 bool DirectoryExists(const std::string& dir_path)
 {
     struct stat buffer;
-    if(stat(dir_path.c_str(), &buffer) == 0)
-    {
-        return true;
-    }
-    else
-    {
-       return false;
-    }
+    return stat(dir_path.c_str(), &buffer) == 0;
+}
+
+/**
+ * Returns true if the file exists.
+ * @param file_path   path of file
+ */
+bool FileExists(const std::string& file_path)
+{
+    struct stat buffer;
+    return stat(file_path.c_str(), &buffer) == 0;
 }

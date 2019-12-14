@@ -27,6 +27,6 @@ enum class API
     SymbolList
 };
 
-std::string CreateUrl(API service_request, const std::string& stock_symbol = "");       
-void CheckApiKey();
-void CheckApiResponse(const std::string& response);
+std::string CreateUrlForRequest(API service_request, const std::string& stock_symbol = "");       
+void CheckResponse(const std::string& response);
+void CheckApiKeyChanged();
