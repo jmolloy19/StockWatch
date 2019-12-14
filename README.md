@@ -16,7 +16,7 @@ Note: World Trading Data offers a free API key however it only allows 250 reques
 #### Inserting Your API Key
 
 You will need to insert your World Trading Data API key into the file
-[world_trading_api.hpp](https://github.com/jmolloy19/StockWatch/blob/master/include/stockwatch/world_trading_api.hpp)
+[world_trading_data.hpp](https://github.com/jmolloy19/StockWatch/blob/master/include/stockwatch/world_trading_data.hpp)
 
 ```
 Your Example API Key: 667myExampleApiKey99099IAmAPoorBoyToo77
