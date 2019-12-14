@@ -30,25 +30,23 @@ bool Stock::ExhibitsHighTightFlag()
 	{
 		return false;
 	}
-	else if (*highest / *lowest < 1.9)
+	if (*highest / *lowest < 1.9)
 	{
 		return false;
 	}
-	else if( std::distance(most_recent, highest) > 15 )
+	if( std::distance(most_recent, highest) > 15 )
 	{
 		return false;
 	}
-	else
+	
+	for(it = most_recent; it < highest; it++)
 	{
-		for(it = most_recent; it < highest; it++)
+		if( *it < (*highest * .8) )
 		{
-			if( *it < (*highest * .8) )
-			{
-				return false;
-			}
-		}	
-	}
-			
+			return false;
+		}
+	}	
+				
 	return true;
 }
 
@@ -58,8 +56,15 @@ bool Stock::ExhibitsHighTightFlag()
 void Stock::Init()
 {
 	std::string data_buffer;
-	GetHistoricalData(&data_buffer);
-	ParseHistoricalData(data_buffer);
+	try
+	{
+		GetHistoricalData(&data_buffer);	
+		ParseHistoricalData(data_buffer);
+	}
+	catch(const std::exception& e)
+	{
+		return;
+	}
 }
 
 /**
@@ -78,8 +83,7 @@ void Stock::GetHistoricalData(std::string* data_buffer)
 	}
 	else
 	{
-		std::string url = CreateUrlForRequest(API::HistoricalData, symbol_);
-		MakeHttpRequest(url, data_buffer);
+		MakeApiCall(API::HistoricalData, data_buffer, symbol_);
 
 		if(write_file_)
 		{
@@ -94,19 +98,12 @@ void Stock::GetHistoricalData(std::string* data_buffer)
  * @param historical_data 	string of historical data that will be parsed and inputted into object
  */
 void Stock::ParseHistoricalData(const std::string& historical_data)
-{
-    std::string csv_header = "Date,Open,Close,High,Low,Volume";
-
-	if(historical_data.find(csv_header) == std::string::npos)	 // No header means bad API call
-	{
-		return;
-	}
-                                                       															       
+{                                             															       
 	std::string::const_iterator it,
 								begin = historical_data.begin(), 
 								end = historical_data.end();
 	
-	size_t found = 32;							                 // Skip header	    
+	size_t found = 32;							                     // Skip header	    
 
 	while(it != end)						                
 	{	
@@ -130,6 +127,7 @@ void Stock::ParseHistoricalData(const std::string& historical_data)
 			volumes_.push_back(std::stoi(volumeStr));
 			it = std::find(it, end, ',');
 		}
+		
 	}
 }
 

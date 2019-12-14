@@ -14,6 +14,7 @@ class StockWatch
         StockWatch(const StockWatch& s) = delete;
 		StockWatch& operator=(const StockWatch &) = delete;
         StockWatch(int argc, char* argv[]);
+        ~StockWatch();
         void Run();
         void PrintStockList();
     private:
@@ -21,7 +22,7 @@ class StockWatch
         void CheckStock(const std::string& stock_symbol);
         void GetStockList(std::string* stocklist_buffer);
         void ParseStockList(const std::string& stocklist_buffer);
-        bool IsValidStock(const std::string& stock_symbol);
+        bool ValidStockSymbol(const std::string& stock_symbol);
         void PrintReport();
         int num_stocks_ = 0;
         std::vector<std::string> stocks_;

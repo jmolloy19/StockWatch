@@ -9,7 +9,30 @@ StockWatch::StockWatch(int argc, char* argv[]) :
     options_(Options(argc, argv))
 {
     Init();
+}
+
+/**
+ * Initializes StockWatch by creating the list of stocks to analyze.
+ */
+void StockWatch::Init()
+{
+	curl_global_init(CURL_GLOBAL_ALL);
+
+    if(!DirectoryExists("./datafiles"))
+    {
+        CreateDirectory("./datafiles");
+    }
+
+    std::cout << "\nAqcuiring List of Stocks . . ." << "\r" << std::flush;
+
+    std::string stocklist_buffer;
+    GetStockList(&stocklist_buffer);
+    ParseStockList(stocklist_buffer);
+
+    num_stocks_ = stocks_.size();
     high_tight_flags_.reserve(num_stocks_);
+
+    std::cout << "Number of Stocks to Analyze = " << num_stocks_ << "\n\n";
 }
 
 /**
@@ -27,7 +50,7 @@ void StockWatch::Run()
     {
         for(int thr = 0; thr < MAX_THREADS && i < num_stocks_; thr++, i++)
         {
-            threads.emplace_back(&StockWatch::CheckStock, this, stocks_[thr]);    
+            threads.emplace_back(&StockWatch::CheckStock, this, stocks_[i]);    
         }
 
         for(int thr = 0; thr < threads.size(); thr++)
@@ -40,22 +63,6 @@ void StockWatch::Run()
     }
 
     PrintReport();
-}
-
-/**
- * Initializes StockWatch by creating the list of stocks to analyze.
- */
-void StockWatch::Init()
-{
-    std::cout << "\nAqcuiring List of Stocks . . ." << "\r" << std::flush;
-
-    std::string stocklist_buffer;
-    GetStockList(&stocklist_buffer);
-    ParseStockList(stocklist_buffer);
-
-    num_stocks_ = stocks_.size();
-
-    std::cout << "Retrieved " << num_stocks_ << " Stocks to Analyze\n\n";
 }
 
 /**
@@ -91,11 +98,7 @@ void StockWatch::GetStockList(std::string* stocklist_buffer)
     }
     else
     {
-        std::string url = CreateUrlForRequest(API::SymbolList);
-	    
-        MakeHttpRequest(url, stocklist_buffer);
-        CheckResponse(*stocklist_buffer);
-
+        MakeApiCall(API::SymbolList, stocklist_buffer);
 		WriteToFile("./stocklist.csv", *stocklist_buffer);
     }
 }
@@ -108,17 +111,6 @@ void StockWatch::GetStockList(std::string* stocklist_buffer)
  */
 void StockWatch::ParseStockList(const std::string& stocklist_buffer)
 {
-    std::string stocklist_header = "Symbol,Name,Currency,\"Stock Exchange Long\",\"Stock Exchange Short\"";
-
-
-	if(stocklist_buffer.find(stocklist_header) == std::string::npos)	// No header means bad API call
-	{
-		std::cerr << "Error: Your \'stocklist.csv\' file is invalid.\n"
-                  << "Check the file for an unexpected response from World Trading Data.\n"
-                  << "To resolve issue, either delete the file or run with \'--update-list\' option.\n"; 
-        exit(-1);
-	}
-
     std::string::const_iterator it, 
 						        begin = stocklist_buffer.begin(), 
 						        end   = stocklist_buffer.end();
@@ -134,15 +126,12 @@ void StockWatch::ParseStockList(const std::string& stocklist_buffer)
 		{                                                        // if it's on the NASDAQ or NYSE
 			stock_symbol = std::string(it, find(it, end, ','));
 		}
-		else if(options_.IncludeNYSE())
+		else if(options_.IncludeNYSE() && line.find("NYSE") != std::string::npos)
 		{
-			if(line.find("NYSE") != std::string::npos)
-			{
-				stock_symbol = std::string(it, find(it, end, ','));
-			}
+			stock_symbol = std::string(it, find(it, end, ','));	
 		}
 		
-		if(IsValidStock(stock_symbol))
+		if(ValidStockSymbol(stock_symbol))
 		{
 			stocks_.push_back(stock_symbol);
 		}
@@ -155,24 +144,23 @@ void StockWatch::ParseStockList(const std::string& stocklist_buffer)
  * Verifies whether the string is a valid stock symbol.
  * @param stock_symbol 	stock symbol to verify
  */
-bool StockWatch::IsValidStock(const std::string& stock_symbol)
+bool StockWatch::ValidStockSymbol(const std::string& stock_symbol)
 {
 	if(stock_symbol.size() > 5 || stock_symbol.empty())
     {                                                            // Exclude any empty or greater
 		return false;                                            // than 5 character stock_symbol  
     }					
-	else
-	{
-		std::string::const_iterator it;
-		for(it = stock_symbol.begin(); it != stock_symbol.end(); it++)
-        {
-			if(*it < 65 || *it > 90)                             // Exclude symbols with characters
-            {                                                    // outside the range 'A' - 'Z'
-				return false;
-            }				                    
-        }	 
-		return true;
-	}
+	
+    std::string::const_iterator it;
+    for(it = stock_symbol.begin(); it != stock_symbol.end(); it++)
+    {
+        if(*it < 65 || *it > 90)                                 // Exclude symbols with characters
+        {                                                        // outside the range 'A' - 'Z'
+            return false;
+        }				                    
+    }
+
+    return true;	
 }
 
 /**
@@ -196,7 +184,7 @@ void StockWatch::PrintStockList()
  */
 void StockWatch::PrintReport()
 {
-    std::cout << "--Stocks That Exhibit Pattern--";
+    std::cout << "\n\n--Stocks That Exhibit Pattern--";
 
     for(int i = 0; i < high_tight_flags_.size(); i++)
     {
@@ -204,6 +192,22 @@ void StockWatch::PrintReport()
         {
             std::cout << '\n';
         }
-        std::cout << high_tight_flags_[i] << ", ";
+        std::cout << high_tight_flags_[i];
+        if(i != high_tight_flags_.size() - 1)
+        {
+            std::cout << ", ";
+        }
+        else
+        {
+            std::cout << "\n\n";
+        }
     }
+}
+
+/**
+ * Destructor for StockWatch class.
+ */
+StockWatch::~StockWatch()
+{
+	curl_global_cleanup();
 }

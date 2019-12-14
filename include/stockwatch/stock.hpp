@@ -2,8 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <utility/files.hpp>
-#include <utility/http_request.hpp>
-#include <stockwatch/world_trading_api.hpp>
+#include <stockwatch/world_trading_data.hpp>
 
 class Stock
 {

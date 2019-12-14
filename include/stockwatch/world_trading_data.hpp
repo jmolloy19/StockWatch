@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <iostream>
+#include <utility/http_request.hpp>
 
 /**
  * World Trading Data API
@@ -27,6 +28,8 @@ enum class API
     SymbolList
 };
 
-std::string CreateUrlForRequest(API service_request, const std::string& stock_symbol = "");       
-void CheckResponse(const std::string& response);
-void CheckApiKeyChanged();
+void MakeApiCall(const API service, std::string* buffer, const std::string& stock_symbol = "");
+void CheckApiResponse(const API service, const std::string& response);
+std::string BuildUrlForRequest(const API service, const std::string& stock_symbol);
+bool ValidHeader(const API service, const std::string& response);   
+void CheckApiKey(const std::string& response);

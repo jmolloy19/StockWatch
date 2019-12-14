@@ -7,6 +7,11 @@
  */
 void ReadFromFile(const std::string& file_path, std::string* read_buffer)
 {
+    if(!FileExists(file_path))
+    {
+        throw std::runtime_error("Unable to read datafile: Does not exist\n");
+    }
+
     std::ifstream in_file(file_path);
     if(in_file.is_open())
     {
@@ -29,23 +34,6 @@ void ReadFromFile(const std::string& file_path, std::string* read_buffer)
  */
 void WriteToFile(const std::string& file_path, const std::string& write_buffer, std::ios::openmode open_mode)
 {
-    std::string dir_path;
-    const size_t last_slash_idx = file_path.rfind('/');
-    if (std::string::npos != last_slash_idx)
-    {
-        dir_path = file_path.substr(0, last_slash_idx);
-    }
-
-    if(!DirectoryExists(dir_path))
-    {
-        if(!CreateDirectory(dir_path))
-        {
-            std::cerr << "Could not create directory: " << dir_path << "\n"
-                      << std::strerror(errno);
-            exit(-1);
-        }     
-    }
-
     if(FileExists(file_path))
     {
         std::remove(file_path.c_str());
@@ -65,19 +53,17 @@ void WriteToFile(const std::string& file_path, const std::string& write_buffer, 
 }
 
 /**
- * Returns true if the directory was successfully created.
+ * Creates the directory specified by dir_path.
  * @param dir_path  dirctory path
  */
-bool CreateDirectory(const std::string& dir_path)
+void CreateDirectory(const std::string& dir_path)
 {
-    if(mkdir(dir_path.c_str(), ACCESSPERMS) == 0)
+    if(!mkdir(dir_path.c_str(), ACCESSPERMS) == 0)
     {
-        return true;
+        std::cerr << "Could not create directory: " << dir_path << "\n"
+                  << std::strerror(errno) << '\n';
+        exit(-1);
     }
-    else
-    {
-        return false;
-    }  
 }
 
 /**
