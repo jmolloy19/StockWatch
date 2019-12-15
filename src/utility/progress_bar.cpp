@@ -1,5 +1,8 @@
 #include <utility/progress_bar.hpp>
 
+/**
+ * Displays a progress bar.
+ */
 void DisplayProgressBar(int complete, int total_amount)
 {
     double fraction_done = ((double)complete / (double)total_amount);
