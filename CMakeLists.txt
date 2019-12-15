@@ -6,7 +6,11 @@ project(StockWatch)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/utility)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/stockwatch)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+
+option(Test "Build Debugging Tests" OFF)
+if(Test)
+    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/test)
+endif()
 
 add_executable(StockWatch
     ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp

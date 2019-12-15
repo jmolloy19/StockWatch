@@ -58,7 +58,7 @@ void WriteToFile(const std::string& file_path, const std::string& write_buffer, 
  */
 void CreateDirectory(const std::string& dir_path)
 {
-    if(!mkdir(dir_path.c_str(), ACCESSPERMS) == 0)
+    if(mkdir(dir_path.c_str(), ACCESSPERMS) != 0)
     {
         std::cerr << "Could not create directory: " << dir_path << "\n"
                   << std::strerror(errno) << '\n';

@@ -3,6 +3,10 @@ set -eu
 rm -rf build || true
 mkdir build
 cd build
-cmake .. #cmake -D CMAKE_BUILD_TYPE=DEBUG
+if [ "${1-default_no_tests}" == "test" ]; then
+    cmake .. -DTest:BOOL=ON
+else
+    cmake ..
+fi
 make -j
 cd -
