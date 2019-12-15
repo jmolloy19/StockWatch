@@ -12,6 +12,6 @@ void DisplayProgressBar(int complete, int total_amount)
     std::string spaces(num_spaces_to_print, ' ');
 
     std::cout << std::fixed << std::setprecision(2)
-              << " |" << bars << '>' << spaces << "| %" << percent_done << '\r'
+              << '|' << bars << '>' << spaces << "| %" << percent_done << '\r'
               << std::flush;
 }
