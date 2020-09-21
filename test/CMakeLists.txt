@@ -1,31 +1,15 @@
-cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-std=c++14")
-project(StockWatch)
+find_package(GTest REQUIRED)
 
-link_libraries(stockwatch)
+enable_testing()
 
-add_executable(ProgressBarTest
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_progress_bar.cpp
-)
+add_executable(finnhub_tests
+        main.cc
+        finnhub_test.cc)
+target_include_directories(finnhub_tests PUBLIC
+        ${PROJECT_SOURCE_DIR}/src
+        ${GTEST_INCLUDE_DIRS})
+target_link_libraries(finnhub_tests
+        stockwatch
+        ${GTEST_LIBRARIES})
 
-add_executable(GetHistoricalDataTest
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_get_historical_data.cpp
-)
-
-add_executable(GetStockListTest
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_get_stock_list.cpp
-)
-
-add_executable(ReadFromFileTest
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_read_from_file.cpp
-)
-
-add_executable(WriteToFileTest
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_write_to_file.cpp
-)
-
-add_executable(OptionsParserTest
-    ${CMAKE_CURRENT_SOURCE_DIR}/test_options_parser.cpp
-)
+add_test(FinnhubTests finnhub_tests)

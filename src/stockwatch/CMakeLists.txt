@@ -1,25 +1,20 @@
-cmake_minimum_required(VERSION 2.8)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "-std=c++14")
-project(StockWatch)
-
 find_package(CURL)
-set(STOCKWATCH_INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../include)
+find_package(glog)
 
 add_library(stockwatch STATIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/world_trading_data.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/stock.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/options.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/stockwatch.cpp
+    finnhub.cc
+    stock.cc
+    stockwatch.cc
 )
 
-target_link_libraries(stockwatch PUBLIC
+target_link_libraries(stockwatch
+    sw_protos
+    glog::glog
+    curl
     -lpthread
-    utility
 )
 
 target_include_directories(stockwatch PUBLIC
-    ${STOCKWATCH_INC_DIR}
+    ${PROJECT_SOURCE_DIR}/src
     ${CURL_INCLUDE_DIR}
 )

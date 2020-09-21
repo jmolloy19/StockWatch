@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package sw;
+
+message Candle {
+    repeated double o = 1;
+    repeated double h = 2;
+    repeated double l = 3;
+    repeated double c = 4;
+    repeated int32 v = 5;
+    repeated int64 t = 6;
+    string s = 7;
+}
