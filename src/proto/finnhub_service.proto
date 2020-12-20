@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package sw;
+
+import "google/protobuf/timestamp.proto";
+
+import "finnhub_resources.proto";
+
+service FinnhubService {
+    rpc GetExchangeSymbols(GetExchangeSymbolsRequest) returns (GetExchangeSymbolsResponse);
+    rpc GetStockCandles(GetStockCandlesRequest) returns (GetStockCandlesResponse);
+}
+
+message GetExchangeSymbolsRequest {
+    // Exchange you want to get the list of symbols from
+    Exchange exchange = 1;
+}
+
+message GetExchangeSymbolsResponse {
+    // List of symbols from requested exchange.
+    repeated Symbol exchange_symbols = 1;
+}
+
+message GetStockCandlesRequest {
+    // Symbol of stock.
+    string stock_symbol = 1;
+    // Frequency of reported candle data.
+    Resolution resolution = 2;
+    // Timestamp of interval start value. 
+    google.protobuf.Timestamp from = 3;
+    // Timestamp of interval end value.
+    google.protobuf.Timestamp to = 4;
+}
+
+message GetStockCandlesResponse {
+    // Candles for requested stock.
+    Candles candles = 1;
+}
+

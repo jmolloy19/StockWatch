@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package sw;
+
+message Symbol {
+    // Price's currency. This might be different from the reporting currency of fundamental data.
+    string currency = 1;
+    // Symbol description
+    string description = 2;
+    // Display symbol name.
+    string display_symbol = 3;
+    // Unique symbol used to identify this symbol used Finnhub endpoint (should be same as symbol).
+    string symbol = 4;
+    // Security type.
+    string type = 5;
+}
+
+enum Resolution {
+    // One minute frequency.
+    kOneMin = 0;
+    // Five minute frequency.
+    kFiveMin = 1;
+    // Fifteen minute frequency.
+    kFifteenMin = 2;
+    // Thirty minute frequency.
+    kThirtyMin = 3;
+    // Sixty minute frequency.
+    kSixtyMin = 4;
+    // Daily frequency.
+    kDay = 5;
+    // Weekly frequency.
+    kWeek = 6;
+    // Monthly frequency
+    kMonth = 7;
+}
+
+enum Exchange {
+    // US exchange (NYSE and NASDAQ)
+    kUs = 0;
+}
+
+message Candles {
+    // List of close prices for returned candles.
+    repeated float c = 1;
+    // List of high prices for returned candles.
+    repeated float h = 2;
+    // List of low prices for returned candles.
+    repeated float l = 3;
+    // List of open prices for returned candles.
+    repeated float o = 4;
+    // Status of the response. This field can either be ok or no_data.
+    string s = 5;
+    // List of timestamps for returned candles.
+    repeated int64 t = 6;
+    // List of volume data for returned candles.
+    repeated int64 v = 7;
+}

@@ -1,13 +1,13 @@
-#include "stockwatch/stockwatch.h"
+#include "stockwatch/stock_watch.h"
 
 #include "glog/logging.h"
 
-int main(int argc, char* argv[]) {
+int main() {
     google::LogToStderr();
     google::InitGoogleLogging("StockWatch");
 
     sw::StockWatch program;
-    program.Init();
     program.Run();
-    program.PrintResults();
+
+    return 0;
 }

@@ -3,8 +3,8 @@ set(Protobuf_USE_STATIC_LIBS OFF)
 find_package(Protobuf REQUIRED)
 
 set(SW_PROTOS
-    ticker_list.proto
-    candle.proto)
+    finnhub_resources.proto
+    finnhub_service.proto)
 
 generate_protos(SW_PROTO_SRCS SW_PROTO_HDRS ${CMAKE_CURRENT_BINARY_DIR} ${SW_PROTOS})
 

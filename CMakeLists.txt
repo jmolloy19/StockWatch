@@ -6,22 +6,12 @@ project(StockWatch)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/src/cmake)
 
+add_compile_options(-Wall -Wextra -pedantic)
+
 add_subdirectory(src/proto)
-add_subdirectory(src/stockwatch)
+add_subdirectory(src/cc)
 
 option(Test "Build Debugging Tests" OFF)
 if(Test)
     add_subdirectory(test)
 endif()
-
-add_executable(StockWatch
-    src/main.cpp
-)
-
-target_link_libraries(StockWatch
-    stockwatch
-)
-
-target_include_directories(StockWatch PUBLIC
-    src
-)
