@@ -1,3 +1,0 @@
-add_subdirectory(finnhub)
-add_subdirectory(patterns)
-add_subdirectory(stockwatch)
