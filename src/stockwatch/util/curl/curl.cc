@@ -1,17 +1,13 @@
-#ifndef STOCKWATCH_UTIL_CURL_CURL_H_
-#define STOCKWATCH_UTIL_CURL_CURL_H_
+#include "curl.h"
 
 #include "curl/curl.h"
 #include "glog/logging.h"
 
-namespace sw {
+namespace stockwatch {
+namespace util {
+namespace curl {
 
-class Curl {
-   public:
-    Curl() = default;
-    ~Curl() = default;
-
-    static void MakeRequest(const std::string& url, std::string* response) {
+void MakeRequest(const std::string& url, std::string* response) {
         CHECK_NOTNULL(response);
 
         CURL* curl = curl_easy_init();
@@ -34,18 +30,17 @@ class Curl {
         }
     }
 
-   protected:
-    static size_t Callback(void* contents, size_t size, size_t nmemb, void* userp) {
-        try {
-            static_cast<std::string*>(userp)->append(static_cast<char*>(contents), size * nmemb);
-        } catch (std::bad_alloc& err) {
-            LOG(ERROR) << "Memory allocation failed. Error: " << err.what();
-            return 0;
-        }
-
-        return size * nmemb;
+size_t Callback(void* contents, size_t size, size_t nmemb, void* userp) {
+    try {
+        static_cast<std::string*>(userp)->append(static_cast<char*>(contents), size * nmemb);
+    } catch (std::bad_alloc& err) {
+        LOG(ERROR) << "Memory allocation failed. Error: " << err.what();
+        return 0;
     }
-};
 
-}  // namespace sw
-#endif  // STOCKWATCH_UTIL_CURL_CURL_H_
+    return size * nmemb;
+}
+
+}  // namespace curl
+}  // namespace util
+}  // namespace stockwatch

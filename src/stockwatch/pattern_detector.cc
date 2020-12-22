@@ -2,28 +2,15 @@
 
 #include <algorithm>
 
-#include "stockwatch/util/rapidjson/prettywriter.h"
-#include "stockwatch/util/rapidjson/stringbuffer.h"
-
-namespace sw {
+namespace stockwatch {
 
 bool PatternDetector::ExhibitsHighTightFlag(const rapidjson::Document& candles) {
-    // if (not candles.HasMember("candles")) {
-    //     return false;
-    // }
+    DCHECK(not candles.HasParseError());
 
-    // if (not candles["candles"].HasMember("c") or not candles["candles"].HasMember("v") or not
-    // candles["candles"].HasMember("s")) {
-    //     return false;
-    // }
+    if (not HasAtleastNumTradingDays(candles, 45)) {
+        return false;
+    }
 
-    // if (std::strcmp(candles["candles"]["s"].GetString(), "ok") != 0) {
-    //     return false;
-    // }
-
-    // const auto& closes = candles["candles"]["c"];
-    // const auto& volumes = candles["candles"]["v"];
-    IsValidCandles()
     const auto& closes = candles["c"];
     const auto& volumes = candles["v"];
 
@@ -31,7 +18,7 @@ bool PatternDetector::ExhibitsHighTightFlag(const rapidjson::Document& candles) 
     const auto* flag_pole_top = MaxElement(closes);
 
     // Price must double within 45 trading day period.
-    if (HasZeroClose(closes) or flag_pole_top->GetFloat() / flag_pole_bottom->GetFloat() < 2.0) {
+    if (flag_pole_bottom->GetFloat() == 0 or flag_pole_top->GetFloat() / flag_pole_bottom->GetFloat() < 2.0) {
         return false;
     }
 
@@ -51,49 +38,28 @@ bool PatternDetector::ExhibitsHighTightFlag(const rapidjson::Document& candles) 
         }
     }
 
-    if (HasAtleastAverageClose(kMinAverageClose, closes)) {
+    if (HasZeroClose(closes) or not HasAtleastAverageClose(closes, kMinAverageClose)) {
         return false;
     }
 
-    if (HasZeroVolume(candles) or not HasAtleastAverageVolume(kMinAverageVolume, volumes)) {
-        return false;
-    }
-
-    return true;
-}
-
-bool PatternDetector::IsValidJsonDoc(const rapidjson::Document& candles) {
-    if (candles.HasParseError()) {
-        return false;
-    }
-
-    if (not candles.HasMember("c") or not candles.HasMember("v") or not candles.HasMember("s")) {
-        VLOG(1) << "Invalid candles JSON document: " << JsonDocToString(candles);
-        return false;
-    }
-
-    if (std::strcmp(candles["s"].GetString(), "ok") != 0) {
-        return false;
-    }
-
-    if (not HasAtleastNumTradingDays(45, candles)) {
+    if (HasZeroVolume(volumes) or not HasAtleastAverageVolume(volumes, kMinAverageVolume)) {
         return false;
     }
 
     return true;
 }
 
-bool PatternDetector::HasAtleastNumTradingDays(size_t num_trading_days, const rapidjson::Document& candles) {
+bool PatternDetector::HasAtleastNumTradingDays(const rapidjson::Document& candles, size_t num_trading_days) {
     // return candles["candles"]["c"].GetArray().Size() >= num_trading_days and
     // candles["candles"]["v"].GetArray().Size() >= num_trading_days;
     return candles["c"].GetArray().Size() >= num_trading_days and candles["v"].GetArray().Size() >= num_trading_days;
 }
 
-bool PatternDetector::HasAtleastAverageClose(double average_close, const rapidjson::Value& closes) {
+bool PatternDetector::HasAtleastAverageClose(const rapidjson::Value& closes, double average_close) {
     return Average(closes) >= average_close;
 }
 
-bool PatternDetector::HasAtleastAverageVolume(int average_volume, const rapidjson::Value& volumes) {
+bool PatternDetector::HasAtleastAverageVolume(const rapidjson::Value& volumes, int average_volume) {
     return Average(volumes) >= average_volume;
 }
 
@@ -103,6 +69,7 @@ bool PatternDetector::HasZeroVolume(const rapidjson::Value& volumes) { return Ha
 
 double PatternDetector::Average(const rapidjson::Value& array) {
     DCHECK(array.IsArray());
+
     double total = 0;
 
     for (const auto& element : array.GetArray()) {
@@ -127,14 +94,18 @@ double PatternDetector::Average(const rapidjson::Value& array) {
 rapidjson::Value::ConstValueIterator PatternDetector::MinElement(const rapidjson::Value& array) {
     DCHECK(array.IsArray());
 
-    if (array.Size() <= 1) {
-        return array.Begin();
+    const auto begin = array.GetArray().Begin();
+    const auto end = array.GetArray().End();
+    const size_t size = array.GetArray().Size();
+
+    if (size <= 1) {
+        return begin;
     }
 
     double min = 0;
-    auto min_itr = array.GetArray().Begin();
+    auto min_itr = begin;
 
-    for (auto itr = array.GetArray().Begin(); itr != array.GetArray().End(); ++itr) {
+    for (auto itr = begin; itr != end; ++itr) {
         DCHECK(itr->IsNumber());
 
         if (itr->IsDouble()) {
@@ -171,14 +142,18 @@ rapidjson::Value::ConstValueIterator PatternDetector::MinElement(const rapidjson
 rapidjson::Value::ConstValueIterator PatternDetector::MaxElement(const rapidjson::Value& array) {
     DCHECK(array.IsArray());
 
-    if (array.GetArray().Size() <= 1) {
-        return array.GetArray().Begin();
+    const auto begin = array.GetArray().Begin();
+    const auto end = array.GetArray().End();
+    const size_t size = array.GetArray().Size();
+
+    if (size <= 1) {
+        return begin;
     }
 
     double max = 0;
-    auto max_itr = array.GetArray().Begin();
+    auto max_itr = begin;
 
-    for (auto itr = array.GetArray().Begin(); itr != array.GetArray().End(); ++itr) {
+    for (auto itr = begin; itr != end; ++itr) {
         DCHECK(itr->IsNumber());
 
         if (itr->IsDouble()) {
@@ -212,13 +187,4 @@ rapidjson::Value::ConstValueIterator PatternDetector::MaxElement(const rapidjson
     return max_itr;
 }
 
-std::string PatternDetector::JsonDocToString(const rapidjson::Document& document) {
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
-
-    document.Accept(writer);
-
-    return buffer.GetString();
-}
-
-}  // namespace sw
+}  // namespace stockwatch

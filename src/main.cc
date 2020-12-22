@@ -6,7 +6,7 @@ int main() {
     google::LogToStderr();
     google::InitGoogleLogging("StockWatch");
 
-    sw::StockWatch program;
+    stockwatch::StockWatch program;
     program.Run();
 
     return 0;

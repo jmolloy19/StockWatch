@@ -6,7 +6,7 @@
 #include "stockwatch/finnhub.h"
 #include "stockwatch/stock.h"
 
-namespace sw {
+namespace stockwatch {
 
 StockWatch::~StockWatch() { curl_global_cleanup(); }
 
@@ -21,7 +21,7 @@ void StockWatch::Run() {
     processing_threads_.reserve(max_processing_threads);
 
     for (uint i = 0; i < max_processing_threads; i++) {
-        processing_threads_.emplace_back(&sw::StockWatch::StartProcessingWorker, this);
+        processing_threads_.emplace_back(&stockwatch::StockWatch::StartProcessingWorker, this);
     }
 
     for (auto& thread : processing_threads_) {
@@ -52,15 +52,14 @@ void StockWatch::Init() {
 
     stock_itr_ = stocks_.begin();
 
-    LOG(INFO) << "Stocks to process on exchange(" << Finnhub::ToString(Finnhub::Exchange::kUs)
-              << "): " << stocks_.size();
+    LOG(INFO) << "Stocks to process on exchange(US): " << stocks_.size();
 }
 
 void StockWatch::StartProcessingWorker() {
     std::vector<Stock>::iterator stock = GetNextStock();
 
     while (stock != stocks_.cend()) {
-        std::string json = finnhub_.RequestCandles(stock->Symbol(), NumDaysAgo(90), Now());
+        std::string json = RequestCandlesJson(stock);
 
         stock->ParseFromJson(json);
 
@@ -68,8 +67,6 @@ void StockWatch::StartProcessingWorker() {
         
         stock = GetNextStock();
     }
-
-    VLOG(1) << "Processing worker finished and ready to join.";
 }
 
 std::vector<Stock>::iterator StockWatch::GetNextStock() {
@@ -81,6 +78,16 @@ std::vector<Stock>::iterator StockWatch::GetNextStock() {
 
     LOG_EVERY_N(INFO, 100) << google::COUNTER << "/" << stocks_.size() << " stocks processed.";
     return stock_itr_++;
+}
+
+std::string StockWatch::RequestSymbolsJson(Finnhub::Exchange exchange) {
+    std::lock_guard<std::mutex> lock(mtx_);
+    return finnhub_.RequestSymbols(exchange);
+}
+
+std::string StockWatch::RequestCandlesJson(const std::vector<Stock>::const_iterator stock) {
+    std::lock_guard<std::mutex> lock(mtx_);
+    return finnhub_.RequestCandles(stock->Symbol(), NumDaysAgo(90), Now());
 }
 
 bool StockWatch::IsValidSymbol(const rapidjson::Value& symbol) {
@@ -101,16 +108,13 @@ bool StockWatch::IsValidSymbol(const rapidjson::Value& symbol) {
     }
 
     size_t symbol_length = std::strlen(symbol_str);
-    if (symbol_str[0] < 'I') {
-        return false;
-    }
-    if (symbol_length > 5) {
+
+    if (symbol_length < 1 or symbol_length > 5) {
         return false;
     }
 
     for (size_t i = 0; i < symbol_length; ++i) {
         if (symbol_str[i] < 'A' or symbol_str[i] > 'Z') {
-            // LOG(INFO) << "symbol(" << symbol_str << ") has char: " << symbol_str[i];
             return false;
         }
     }
@@ -126,4 +130,4 @@ std::chrono::system_clock::time_point StockWatch::NumDaysAgo(int days) {
     return std::chrono::system_clock::now() - std::chrono::hours(days * 24);
 }
 
-}  // namespace sw
+}  // namespace stockwatch

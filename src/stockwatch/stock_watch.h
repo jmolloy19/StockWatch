@@ -4,15 +4,16 @@
 #include <thread>
 #include <vector>
 
+#include "rapidjson/document.h"
+
 #include "stockwatch/stock.h"
 #include "stockwatch/finnhub.h"
-#include "stockwatch/util/rapidjson/document.h"
 
-namespace sw {
+namespace stockwatch {
 
 class StockWatch {
    public:
-    StockWatch() = default;
+    StockWatch() : finnhub_("btefmvv48v6qag09vpag", 60) {}
     ~StockWatch();
     StockWatch(const StockWatch& s) = delete;
     StockWatch& operator=(const StockWatch&) = delete;
@@ -22,7 +23,10 @@ class StockWatch {
    protected:
     void Init();
     void StartProcessingWorker();
+    void StartQueueingWorker();
     std::vector<Stock>::iterator GetNextStock();
+    std::string RequestSymbolsJson(enum Finnhub::Exchange exchange);
+    std::string RequestCandlesJson(const std::vector<Stock>::const_iterator stock);
 
     static bool IsValidSymbol(const rapidjson::Value& symbol);
     static std::chrono::system_clock::time_point Now();
@@ -37,5 +41,5 @@ class StockWatch {
     Finnhub finnhub_;
 };
 
-}  // namespace sw
+}  // namespace stockwatch
 #endif  // STOCKWATCH_STOCKWATCH_STOCKWATCH_H_

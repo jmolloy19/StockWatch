@@ -6,9 +6,9 @@
 
 #include "glog/logging.h"
 
-#include "stockwatch/util/rapidjson/document.h"
+#include "rapidjson/document.h"
 
-namespace sw {
+namespace stockwatch {
 
 class PatternDetector {
    public:
@@ -18,14 +18,11 @@ class PatternDetector {
     static bool ExhibitsHighTightFlag(const rapidjson::Document& candles);
 
    protected:
-    static bool IsValidCandles(const rapidjson::Document& candles);
-    
-    static bool HasAtleastNumTradingDays(size_t num_trading_days, const rapidjson::Document& candles);
-    static bool HasAtleastAverageClose(double average_close, const rapidjson::Value& closes);
-    static bool HasAtleastAverageVolume(int average_volume, const rapidjson::Value& volumes);
+    static bool HasAtleastNumTradingDays(const rapidjson::Document& candles, size_t num_trading_days);
+    static bool HasAtleastAverageClose(const rapidjson::Value& closes, double average_close);
+    static bool HasAtleastAverageVolume(const rapidjson::Value& volumes, int average_volume);
     static bool HasZeroClose(const rapidjson::Value& closes);
     static bool HasZeroVolume(const rapidjson::Value& volumes);
-    static std::string JsonDocToString(const rapidjson::Document& document);
 
     static rapidjson::Value::ConstValueIterator MinElement(const rapidjson::Value& array);
     static rapidjson::Value::ConstValueIterator MaxElement(const rapidjson::Value& array);
@@ -103,5 +100,5 @@ class PatternDetector {
     static constexpr float kMinAverageClose = 1.0;
 };
 
-}  // namespace sw
+}  // namespace stockwatch
 #endif  // STOCKWATCH_PATTERN_DETECTOR_H_

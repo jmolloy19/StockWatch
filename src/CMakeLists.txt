@@ -1,11 +1,22 @@
-add_subdirectory(stockwatch)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+find_package(glog)
 
 add_executable(stockwatch
     main.cc
+    stockwatch/stock_watch.cc
+    stockwatch/stock.cc
+    stockwatch/finnhub.cc
+    stockwatch/pattern_detector.cc
+    stockwatch/util/curl/curl.cc
+    stockwatch/util/io/io.cc
 )
 
 target_link_libraries(stockwatch
-    sw
+    curl
+    glog::glog
+    -lpthread
+)
+
+target_include_directories(stockwatch PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CURL_INCLUDE_DIRS}
 )
