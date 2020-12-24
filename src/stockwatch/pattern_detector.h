@@ -15,10 +15,10 @@ class PatternDetector {
     PatternDetector() = default;
     ~PatternDetector() = default;
 
-    static bool ExhibitsHighTightFlag(const rapidjson::Document& candles);
+    static bool ExhibitsHighTightFlag(const rapidjson::Value& candles);
 
    protected:
-    static bool HasAtleastNumTradingDays(const rapidjson::Document& candles, size_t num_trading_days);
+    static bool HasAtleastNumTradingDays(const rapidjson::Value& candles, size_t num_trading_days);
     static bool HasAtleastAverageClose(const rapidjson::Value& closes, double average_close);
     static bool HasAtleastAverageVolume(const rapidjson::Value& volumes, int average_volume);
     static bool HasZeroClose(const rapidjson::Value& closes);

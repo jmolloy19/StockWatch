@@ -10,22 +10,27 @@ namespace stockwatch {
 class Stock {
    public:
     Stock() = delete;
-    Stock(const std::string& symbol) : symbol_(symbol) {}
+    Stock(const rapidjson::Value& security);
     Stock(Stock&&) = default;
     ~Stock() = default;
 
     void ParseFromJson(const std::string& json);
     bool ExhibitsHighTightFlag() const;
-    const std::string& Symbol() const;
-    std::string ToString() const;
+    void Clear();
 
-    protected:
-    static std::string JsonDocToString(const rapidjson::Document& document);
+    const std::string& Symbol() const;
+    const std::string& Description() const;
+    const std::string& MicCode() const;
+    const std::string& SecurityType() const;
 
    private:
     const std::string symbol_;
+    const std::string description_;
+    const std::string mic_code_;
+    const std::string security_type_;
+
     rapidjson::Document candles_;
-    bool is_valid_{false};
+    bool has_valid_candles_{false};
 };
 
 }  // namespace stockwatch

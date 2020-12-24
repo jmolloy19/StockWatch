@@ -2,16 +2,16 @@
 #define STOCKWATCH_FINNHUB_H_
 
 #include <chrono>
-#include <string>
 #include <condition_variable>
 #include <mutex>
+#include <string>
 
 namespace stockwatch {
 
 class Finnhub {
    public:
     Finnhub() = delete;
-    Finnhub(const std::string& api_key, int calls_per_min = 60);
+    Finnhub(const std::string& api_key, int calls_per_min);
     ~Finnhub() = default;
 
     enum class Exchange { kUnset, kUs };
@@ -28,26 +28,25 @@ class Finnhub {
         kMonth = 8
     };
 
-    std::string RequestSymbols(enum Exchange exchange);
-    std::string RequestCandles(const std::string& symbol,
-                                      const std::chrono::system_clock::time_point& from,
-                                      const std::chrono::system_clock::time_point& to);
-
-    protected:
-    void MakeApiCall(const std::string& url, std::string* response);
+    std::string RequestSecurities(enum Exchange exchange);
+    std::string RequestCandles(const std::string& symbol, const std::chrono::system_clock::time_point& from,
+                               const std::chrono::system_clock::time_point& to);
 
     static std::string ToString(enum Exchange exchange);
     static std::string ToString(enum Resolution resolution);
     static std::string ToString(const std::chrono::system_clock::time_point& time_point);
 
+   protected:
+    void ApiCallLimitWait();
+
    private:
     const std::string api_key_;
     const std::chrono::nanoseconds time_between_calls_;
-    
-    mutable std::mutex mutex_;
+
+    mutable std::mutex mtx_;
 
     std::condition_variable cv_;
-    std::chrono::system_clock::time_point next_request_time_{std::chrono::system_clock::now()};
+    std::chrono::system_clock::time_point next_call_time_;
 };
 
 }  // namespace stockwatch

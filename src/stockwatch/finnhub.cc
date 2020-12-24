@@ -7,18 +7,23 @@
 
 namespace stockwatch {
 
-Finnhub::Finnhub(const std::string& api_key, int calls_per_min) : api_key_(api_key), 
-    time_between_calls_(std::chrono::minutes(1) / calls_per_min) {}
+Finnhub::Finnhub(const std::string& api_key, int calls_per_min)
+    : api_key_(api_key),
+      time_between_calls_(std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::minutes(1)) /
+                          calls_per_min) {}
 
-std::string Finnhub::RequestSymbols(enum Exchange exchange) {
+std::string Finnhub::RequestSecurities(enum Exchange exchange) {
     std::string request("https://finnhub.io/api/v1/stock/symbol");
 
     request.append("?exchange=" + ToString(exchange));
+    request.append("&currency=USD");
+    request.append("&securityType=Common%20Stock");
     request.append("&token=" + api_key_);
 
+    ApiCallLimitWait();
+
     std::string response;
-    MakeApiCall(request, &response);
-    cv_.notify_one();
+    util::curl::MakeRequest(request, &response);
 
     return response;
 }
@@ -33,24 +38,20 @@ std::string Finnhub::RequestCandles(const std::string& symbol, const std::chrono
     request.append("&resolution=" + ToString(Resolution::kDay));
     request.append("&token=" + api_key_);
 
+    ApiCallLimitWait();
+
     std::string response;
+    util::curl::MakeRequest(request, &response);
 
-    std::string filename("/home/jmolloy/Biometrics/StockWatch/Build/jsons/" + symbol + ".json");
-    // util::io::ReadFromFile(filename, &response);
-
-    MakeApiCall(request, &response);
-    cv_.notify_one();
-
-    util::io::WriteToFile(filename, response);
     return response;
 }
 
-void Finnhub::MakeApiCall(const std::string& url, std::string* response) {
-    std::unique_lock<std::mutex> lock(mutex_);
-    cv_.wait_until(lock, next_request_time_);
-
-    util::curl::MakeRequest(url, response);
-    next_request_time_ += time_between_calls_;
+void Finnhub::ApiCallLimitWait() {
+    std::unique_lock<std::mutex> lock(mtx_);
+    while (std::chrono::system_clock::now() < next_call_time_) {
+        cv_.wait_until(lock, next_call_time_);
+    }
+    next_call_time_ = std::chrono::system_clock::now() + time_between_calls_;
 }
 
 std::string Finnhub::ToString(enum Exchange exchange) {

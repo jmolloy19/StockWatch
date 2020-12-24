@@ -1,30 +1,35 @@
 #include "stockwatch/stock_watch.h"
 
+#include <algorithm>
+
 #include "curl/curl.h"
 #include "glog/logging.h"
+#include "rapidjson/error/en.h"
 
-#include "stockwatch/finnhub.h"
-#include "stockwatch/stock.h"
+#include "stockwatch/util/io/io.h"
 
 namespace stockwatch {
+
+StockWatch::StockWatch() : finnhub_("btefmvv48v6qag09vpag", 60) {}
 
 StockWatch::~StockWatch() { curl_global_cleanup(); }
 
 void StockWatch::Run() {
     Init();
 
-    uint thread_contexts = std::thread::hardware_concurrency();
-    uint max_processing_threads = thread_contexts - 1;
+    uint thread_contexts = std::min(std::thread::hardware_concurrency(), 12U);
 
-    LOG(INFO) << "Hardware thread context count: " << thread_contexts;
+    LOG(INFO) << "Hardware thread contexts: " << thread_contexts;
 
-    processing_threads_.reserve(max_processing_threads);
+    std::vector<std::thread> additional_processing_threads;
 
-    for (uint i = 0; i < max_processing_threads; i++) {
-        processing_threads_.emplace_back(&stockwatch::StockWatch::StartProcessingWorker, this);
+    for (uint i = 1; i < thread_contexts; i++) {
+        additional_processing_threads.emplace_back(&stockwatch::StockWatch::StartProcessing, this);
     }
 
-    for (auto& thread : processing_threads_) {
+    StartProcessing();
+
+    for (auto& thread : additional_processing_threads) {
         thread.join();
     }
 
@@ -32,39 +37,40 @@ void StockWatch::Run() {
 }
 
 void StockWatch::Init() {
-    std::string json = finnhub_.RequestSymbols(Finnhub::Exchange::kUs);
+    std::string json = finnhub_.RequestSecurities(Finnhub::Exchange::kUs);
 
-    rapidjson::Document symbols;
-    symbols.Parse(json.c_str());
+    rapidjson::Document securities;
+    securities.Parse(json.c_str());
 
-    if (symbols.HasParseError()) {
-        LOG(ERROR) << "JSON parse error: " << symbols.GetParseError();
+    if (securities.HasParseError()) {
+        LOG(ERROR) << "JSON parse error: " << rapidjson::GetParseError_En(securities.GetParseError()) << ": "
+                   << util::io::JsonValueToString(securities);
         return;
     }
 
-    DCHECK(symbols.IsArray());
+    CHECK(securities.IsArray());
 
-    for (const auto& symbol : symbols.GetArray()) {
-        if (IsValidSymbol(symbol)) {
-            stocks_.emplace_back(symbol["symbol"].GetString());
+    for (const auto& security : securities.GetArray()) {
+        if (ShouldProcess(security)) {
+            stocks_.emplace_back(security);
+        } else {
+            VLOG(2) << "Not processing: " << util::io::JsonValueToString(security);
         }
     }
 
     stock_itr_ = stocks_.begin();
-
     LOG(INFO) << "Stocks to process on exchange(US): " << stocks_.size();
 }
 
-void StockWatch::StartProcessingWorker() {
-    std::vector<Stock>::iterator stock = GetNextStock();
+void StockWatch::StartProcessing() {
+    auto stock = GetNextStock();
 
-    while (stock != stocks_.cend()) {
-        std::string json = RequestCandlesJson(stock);
+    while (stock != stocks_.end()) {
+        stock->ParseFromJson(finnhub_.RequestCandles(stock->Symbol(), NumDaysAgo(90), Now()));
 
-        stock->ParseFromJson(json);
+        LOG_IF(INFO, stock->ExhibitsHighTightFlag()) << "!!!!!! HTF !!!!!!: " << stock->Symbol();
+        stock->Clear();
 
-        LOG_IF(INFO, stock->ExhibitsHighTightFlag()) << "HTF: " << stock->Symbol();
-        
         stock = GetNextStock();
     }
 }
@@ -72,7 +78,6 @@ void StockWatch::StartProcessingWorker() {
 std::vector<Stock>::iterator StockWatch::GetNextStock() {
     std::lock_guard<std::mutex> lock(mtx_);
     if (stock_itr_ == stocks_.end()) {
-        LOG_FIRST_N(INFO, 1) << stocks_.size() << "/" << stocks_.size() << " stocks processed.";
         return stocks_.end();
     }
 
@@ -80,41 +85,30 @@ std::vector<Stock>::iterator StockWatch::GetNextStock() {
     return stock_itr_++;
 }
 
-std::string StockWatch::RequestSymbolsJson(Finnhub::Exchange exchange) {
-    std::lock_guard<std::mutex> lock(mtx_);
-    return finnhub_.RequestSymbols(exchange);
-}
+bool StockWatch::ShouldProcess(const rapidjson::Value& security) {
+    CHECK(security.HasMember("symbol"));
+    CHECK(security.HasMember("currency"));
+    CHECK(security.HasMember("description"));
+    CHECK(security.HasMember("type"));
+    CHECK(security.HasMember("mic"));
 
-std::string StockWatch::RequestCandlesJson(const std::vector<Stock>::const_iterator stock) {
-    std::lock_guard<std::mutex> lock(mtx_);
-    return finnhub_.RequestCandles(stock->Symbol(), NumDaysAgo(90), Now());
-}
+    const char* mic = security["mic"].GetString();
 
-bool StockWatch::IsValidSymbol(const rapidjson::Value& symbol) {
-    CHECK(symbol.HasMember("symbol"));
-    CHECK(symbol.HasMember("currency"));
-    CHECK(symbol.HasMember("type"));
-
-    const char* symbol_str = symbol["symbol"].GetString();
-    const char* currency_str = symbol["currency"].GetString();
-    const char* type_str = symbol["type"].GetString();
-
-    if (std::strcmp(currency_str, "USD") != 0) {
+    if (std::strcmp(mic, "XNMS") != 0 and std::strcmp(mic, "XNCM") != 0 and std::strcmp(mic, "XNGS") != 0 and
+        std::strcmp(mic, "XNYS") != 0) {
         return false;
     }
 
-    if (std::strcmp(type_str, "EQS") != 0) {
-        return false;
-    }
+    const char* symbol = security["symbol"].GetString();
 
-    size_t symbol_length = std::strlen(symbol_str);
+    size_t symbol_length = std::strlen(symbol);
 
     if (symbol_length < 1 or symbol_length > 5) {
         return false;
     }
 
     for (size_t i = 0; i < symbol_length; ++i) {
-        if (symbol_str[i] < 'A' or symbol_str[i] > 'Z') {
+        if (symbol[i] < 'A' or symbol[i] > 'Z') {
             return false;
         }
     }
@@ -122,9 +116,7 @@ bool StockWatch::IsValidSymbol(const rapidjson::Value& symbol) {
     return true;
 }
 
-std::chrono::system_clock::time_point StockWatch::Now() {
-    return std::chrono::system_clock::now();
-}
+std::chrono::system_clock::time_point StockWatch::Now() { return std::chrono::system_clock::now(); }
 
 std::chrono::system_clock::time_point StockWatch::NumDaysAgo(int days) {
     return std::chrono::system_clock::now() - std::chrono::hours(days * 24);

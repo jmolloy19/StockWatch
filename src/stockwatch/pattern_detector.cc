@@ -4,8 +4,8 @@
 
 namespace stockwatch {
 
-bool PatternDetector::ExhibitsHighTightFlag(const rapidjson::Document& candles) {
-    DCHECK(not candles.HasParseError());
+bool PatternDetector::ExhibitsHighTightFlag(const rapidjson::Value& candles) {
+    DCHECK(not candles.IsNull());
 
     if (not HasAtleastNumTradingDays(candles, 45)) {
         return false;
@@ -49,10 +49,8 @@ bool PatternDetector::ExhibitsHighTightFlag(const rapidjson::Document& candles) 
     return true;
 }
 
-bool PatternDetector::HasAtleastNumTradingDays(const rapidjson::Document& candles, size_t num_trading_days) {
-    // return candles["candles"]["c"].GetArray().Size() >= num_trading_days and
-    // candles["candles"]["v"].GetArray().Size() >= num_trading_days;
-    return candles["c"].GetArray().Size() >= num_trading_days and candles["v"].GetArray().Size() >= num_trading_days;
+bool PatternDetector::HasAtleastNumTradingDays(const rapidjson::Value& candles, size_t num_trading_days) {
+    return candles["c"].Size() >= num_trading_days and candles["v"].Size() >= num_trading_days;
 }
 
 bool PatternDetector::HasAtleastAverageClose(const rapidjson::Value& closes, double average_close) {
@@ -94,9 +92,9 @@ double PatternDetector::Average(const rapidjson::Value& array) {
 rapidjson::Value::ConstValueIterator PatternDetector::MinElement(const rapidjson::Value& array) {
     DCHECK(array.IsArray());
 
-    const auto begin = array.GetArray().Begin();
-    const auto end = array.GetArray().End();
-    const size_t size = array.GetArray().Size();
+    const auto begin = array.Begin();
+    const auto end = array.End();
+    const size_t size = array.Size();
 
     if (size <= 1) {
         return begin;

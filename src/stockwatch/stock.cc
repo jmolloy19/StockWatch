@@ -2,48 +2,55 @@
 
 #include "glog/logging.h"
 
+#include "rapidjson/error/en.h"
 #include "stockwatch/pattern_detector.h"
-#include "rapidjson/prettywriter.h"
-#include "rapidjson/stringbuffer.h"
+#include "stockwatch/util/io/io.h"
 
 namespace stockwatch {
+
+Stock::Stock(const rapidjson::Value& security)
+    : symbol_(security["symbol"].GetString()),
+      description_(security["description"].GetString()),
+      mic_code_(security["mic"].GetString()),
+      security_type_(security["type"].GetString()) {}
 
 void Stock::ParseFromJson(const std::string& json) {
     candles_.Parse(json.c_str());
 
     if (candles_.HasParseError()) {
-        LOG(ERROR) << "JSON parse error (" << symbol_ << "): " << candles_.GetParseError();
+        LOG(WARNING) << "JSON parse error (" << symbol_
+                     << "): " << rapidjson::GetParseError_En(candles_.GetParseError());
         return;
     }
 
     if (not candles_.HasMember("c") or not candles_.HasMember("v") or not candles_.HasMember("s")) {
-        LOG(WARNING) << "Invalid candles JSON (" << symbol_ << "): " << JsonDocToString(candles_);
+        VLOG(1) << "Invalid candles JSON (" << symbol_ << "): " << util::io::JsonValueToString(candles_);
         return;
     }
 
     if (std::strcmp(candles_["s"].GetString(), "ok") != 0) {
-        VLOG(2) << "Non \"ok\" candles status (" << symbol_ << "): " << candles_["s"].GetString();
+        VLOG(1) << "Non \"ok\" candles status (" << symbol_ << "): " << candles_["s"].GetString();
         return;
     }
 
-    is_valid_ = true;
+    has_valid_candles_ = true;
 }
 
-bool Stock::ExhibitsHighTightFlag() const { 
-    return is_valid_ ? PatternDetector::ExhibitsHighTightFlag(candles_) : false; 
+bool Stock::ExhibitsHighTightFlag() const {
+    return has_valid_candles_ ? PatternDetector::ExhibitsHighTightFlag(candles_) : false;
 }
 
-std::string Stock::ToString() const { return symbol_ + ":\n" + JsonDocToString(candles_); }
+void Stock::Clear() {
+    candles_.SetNull();
+    candles_.GetAllocator().Clear();
+}
 
 const std::string& Stock::Symbol() const { return symbol_; }
 
-std::string Stock::JsonDocToString(const rapidjson::Document& document) {
-    rapidjson::StringBuffer buffer;
-    rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+const std::string& Stock::Description() const { return description_; }
 
-    document.Accept(writer);
+const std::string& Stock::MicCode() const { return mic_code_; }
 
-    return buffer.GetString();
-}
+const std::string& Stock::SecurityType() const { return security_type_; }
 
 }  // namespace stockwatch
