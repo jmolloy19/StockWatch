@@ -1,6 +1,6 @@
 #include "stockwatch/stock_watch.h"
 
-#include <algorithm>
+#include <string_view>
 
 #include "curl/curl.h"
 #include "glog/logging.h"
@@ -10,105 +10,93 @@
 
 namespace stockwatch {
 
-StockWatch::StockWatch() : finnhub_("btefmvv48v6qag09vpag", 60) {}
+StockWatch::StockWatch(const std::string& api_key) : finnhub_(std::make_shared<Finnhub>(api_key)) {}
 
 StockWatch::~StockWatch() { curl_global_cleanup(); }
 
 void StockWatch::Run() {
-    Init();
+    InitStockList();
 
-    uint thread_contexts = std::min(std::thread::hardware_concurrency(), 12U);
-
-    LOG(INFO) << "Hardware thread contexts: " << thread_contexts;
-
-    std::vector<std::thread> additional_processing_threads;
-
-    for (uint i = 1; i < thread_contexts; i++) {
-        additional_processing_threads.emplace_back(&stockwatch::StockWatch::StartProcessing, this);
+    for (uint i = 1; i < std::thread::hardware_concurrency(); i++) {
+        additional_processing_threads_.emplace_back(&stockwatch::StockWatch::ProcessStockList, this);
     }
 
-    StartProcessing();
+    ProcessStockList();
 
-    for (auto& thread : additional_processing_threads) {
+    for (auto& thread : additional_processing_threads_) {
         thread.join();
     }
-
-    LOG(INFO) << "StockWatch finished successfully!";
 }
 
-void StockWatch::Init() {
-    std::string json = finnhub_.RequestSecurities(Finnhub::Exchange::kUs);
-
-    rapidjson::Document securities;
-    securities.Parse(json.c_str());
-
-    if (securities.HasParseError()) {
-        LOG(ERROR) << "JSON parse error: " << rapidjson::GetParseError_En(securities.GetParseError()) << ": "
-                   << util::io::JsonValueToString(securities);
-        return;
-    }
-
-    CHECK(securities.IsArray());
+void StockWatch::InitStockList() {
+    rapidjson::Document securities = finnhub_->RequestUsSecurities();
 
     for (const auto& security : securities.GetArray()) {
         if (ShouldProcess(security)) {
-            stocks_.emplace_back(security);
-        } else {
-            VLOG(2) << "Not processing: " << util::io::JsonValueToString(security);
+            stock_list_.emplace_back(security, finnhub_);
         }
     }
 
-    stock_itr_ = stocks_.begin();
-    LOG(INFO) << "Stocks to process on exchange(US): " << stocks_.size();
+    next_stock_to_process_ = stock_list_.begin();
 }
 
-void StockWatch::StartProcessing() {
-    auto stock = GetNextStock();
+void StockWatch::ProcessStockList() {
+    auto stock = GetNextStockInList();
 
-    while (stock != stocks_.end()) {
-        stock->ParseFromJson(finnhub_.RequestCandles(stock->Symbol(), NumDaysAgo(90), Now()));
+    while (stock != stock_list_.end()) {
+        stock->InitCandles(NumDaysAgo(150), Now());
 
-        LOG_IF(INFO, stock->ExhibitsHighTightFlag()) << "!!!!!! HTF !!!!!!: " << stock->Symbol();
-        stock->Clear();
+        if (stock->ExhibitsHighTightFlag()) {
+            AddStockToHighTighFlags(stock);
+        }
 
-        stock = GetNextStock();
+        stock = GetNextStockInList();
     }
 }
 
-std::vector<Stock>::iterator StockWatch::GetNextStock() {
+std::vector<Stock>::iterator StockWatch::GetNextStockInList() {
     std::lock_guard<std::mutex> lock(mtx_);
-    if (stock_itr_ == stocks_.end()) {
-        return stocks_.end();
-    }
+    LOG_EVERY_N(INFO, 100) << google::COUNTER << "/" << stock_list_.size() << " stocks processed.";
 
-    LOG_EVERY_N(INFO, 100) << google::COUNTER << "/" << stocks_.size() << " stocks processed.";
-    return stock_itr_++;
+    return next_stock_to_process_ == stock_list_.end() ? stock_list_.end() : next_stock_to_process_++;
+}
+
+void StockWatch::AddStockToHighTighFlags(std::vector<Stock>::const_iterator stock) {
+    std::lock_guard<std::mutex> lock(mtx_);
+    LOG(INFO) << "!!!!!! HTF !!!!!!: " << stock->Symbol();
+    
+    high_tight_flags_.push_back(stock);
 }
 
 bool StockWatch::ShouldProcess(const rapidjson::Value& security) {
     CHECK(security.HasMember("symbol"));
-    CHECK(security.HasMember("currency"));
     CHECK(security.HasMember("description"));
     CHECK(security.HasMember("type"));
     CHECK(security.HasMember("mic"));
 
-    const char* mic = security["mic"].GetString();
+    return IsListedOnNasdaqOrNyse(security) and HasSupportedSymbol(security);
+}
 
-    if (std::strcmp(mic, "XNMS") != 0 and std::strcmp(mic, "XNCM") != 0 and std::strcmp(mic, "XNGS") != 0 and
-        std::strcmp(mic, "XNYS") != 0) {
+bool StockWatch::IsListedOnNasdaqOrNyse(const rapidjson::Value& security) {
+    constexpr std::string_view kNasdaqGlobalMkt = "XNMS";
+    constexpr std::string_view kNasdaqCapitalMkt = "XNCM";
+    constexpr std::string_view kNasdaqGlobalSelectMkt = "XNGS";
+    constexpr std::string_view kNyse = "XNYS";
+
+    std::string_view mic = security["mic"].GetString();
+
+    return mic == kNasdaqGlobalMkt or mic == kNasdaqCapitalMkt or mic == kNasdaqGlobalSelectMkt or mic == kNyse;
+}
+
+bool StockWatch::HasSupportedSymbol(const rapidjson::Value& security) {
+    std::string_view symbol = security["symbol"].GetString();
+
+    if (symbol.size() < 1 or symbol.size() > 5) {
         return false;
     }
 
-    const char* symbol = security["symbol"].GetString();
-
-    size_t symbol_length = std::strlen(symbol);
-
-    if (symbol_length < 1 or symbol_length > 5) {
-        return false;
-    }
-
-    for (size_t i = 0; i < symbol_length; ++i) {
-        if (symbol[i] < 'A' or symbol[i] > 'Z') {
+    for (const auto& letter : symbol) {
+        if (letter < 'A' or letter > 'Z') {
             return false;
         }
     }

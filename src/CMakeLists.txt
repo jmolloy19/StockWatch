@@ -5,9 +5,8 @@ add_executable(stockwatch
     stockwatch/stock_watch.cc
     stockwatch/stock.cc
     stockwatch/finnhub.cc
-    stockwatch/pattern_detector.cc
-    stockwatch/util/curl/curl.cc
     stockwatch/util/io/io.cc
+    stockwatch/util/json/json.cc
 )
 
 target_link_libraries(stockwatch

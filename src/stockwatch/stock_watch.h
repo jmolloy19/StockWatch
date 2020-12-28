@@ -5,16 +5,14 @@
 #include <thread>
 #include <vector>
 
-#include "rapidjson/document.h"
-
-#include "stockwatch/finnhub.h"
 #include "stockwatch/stock.h"
 
 namespace stockwatch {
 
 class StockWatch {
    public:
-    StockWatch();
+    StockWatch() = delete;
+    StockWatch(const std::string& api_key);
     StockWatch(const StockWatch&) = delete;
     StockWatch& operator=(const StockWatch&) = delete;
     ~StockWatch();
@@ -22,10 +20,14 @@ class StockWatch {
     void Run();
 
    protected:
-    void Init();
-    void StartProcessing();
-    std::vector<Stock>::iterator GetNextStock();
+    void InitStockList();
+    void ProcessStockList();
+    std::vector<Stock>::iterator GetNextStockInList();
+    void AddStockToHighTighFlags(std::vector<Stock>::const_iterator stock);
+
     static bool ShouldProcess(const rapidjson::Value& security);
+    static bool IsListedOnNasdaqOrNyse(const rapidjson::Value& security);
+    static bool HasSupportedSymbol(const rapidjson::Value& security);
 
     static std::chrono::system_clock::time_point Now();
     static std::chrono::system_clock::time_point NumDaysAgo(int days);
@@ -33,9 +35,11 @@ class StockWatch {
    private:
     mutable std::mutex mtx_;
 
-    Finnhub finnhub_;
-    std::vector<Stock> stocks_;
-    std::vector<Stock>::iterator stock_itr_;
+    std::shared_ptr<Finnhub> finnhub_;
+    std::vector<Stock> stock_list_;
+    std::vector<Stock>::iterator next_stock_to_process_;
+    std::vector<std::vector<Stock>::const_iterator> high_tight_flags_;
+    std::vector<std::thread> additional_processing_threads_;
 };
 
 }  // namespace stockwatch

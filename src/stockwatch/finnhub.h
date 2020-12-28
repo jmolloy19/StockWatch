@@ -6,42 +6,35 @@
 #include <mutex>
 #include <string>
 
+#include "rapidjson/document.h"
+
 namespace stockwatch {
 
 class Finnhub {
    public:
     Finnhub() = delete;
-    Finnhub(const std::string& api_key, int calls_per_min);
+    Finnhub(const std::string& api_key);
     ~Finnhub() = default;
 
-    enum class Exchange { kUnset, kUs };
+    rapidjson::Document RequestUsSecurities();
+    rapidjson::Document RequestCandles(const std::string& symbol, const std::chrono::system_clock::time_point& from,
+                                       const std::chrono::system_clock::time_point& to);
 
-    enum Resolution {
-        kUnset = 0,
-        kOneMin = 1,
-        kFiveMin = 2,
-        kFifteenMin = 3,
-        kThirtyMin = 4,
-        kSixtyMin = 5,
-        kDay = 6,
-        kWeek = 7,
-        kMonth = 8
-    };
-
-    std::string RequestSecurities(enum Exchange exchange);
-    std::string RequestCandles(const std::string& symbol, const std::chrono::system_clock::time_point& from,
-                               const std::chrono::system_clock::time_point& to);
-
-    static std::string ToString(enum Exchange exchange);
-    static std::string ToString(enum Resolution resolution);
     static std::string ToString(const std::chrono::system_clock::time_point& time_point);
 
    protected:
     void ApiCallLimitWait();
+    void MakeRequest(const std::string& url, std::string* response);
+    
+    static size_t Callback(void* contents, size_t size, size_t nmemb, void* userp);
 
    private:
+    /// Finnhub says the API limit is 60 calls per min, however even at this rate, it will occasionally 
+    /// complain about the api limit being reached. To prevent this, we subtract one from the max calls 
+    /// allowed per min to slightly increase the time between calls.
+    // static constexpr int kMaxApiCallsPerMin = 60 - 1;
+    static constexpr auto kTimeBetweenCalls{std::chrono::seconds(1)};
     const std::string api_key_;
-    const std::chrono::nanoseconds time_between_calls_;
 
     mutable std::mutex mtx_;
 
