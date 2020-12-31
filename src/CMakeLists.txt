@@ -5,13 +5,20 @@ add_executable(stockwatch
     stockwatch/stock_watch.cc
     stockwatch/stock.cc
     stockwatch/finnhub.cc
+    stockwatch/postgres.cc
+    stockwatch/candle.cc
+    stockwatch/pattern/high_tight_flag.cc
     stockwatch/util/io/io.cc
     stockwatch/util/json/json.cc
+    stockwatch/util/curl/curl.cc
+    stockwatch/util/time/time.cc
 )
 
 target_link_libraries(stockwatch
     curl
     glog::glog
+    -lpqxx
+    -lpq
     -lpthread
 )
 

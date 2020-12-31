@@ -13,7 +13,6 @@ bool ReadFromFile(const std::string& filename, std::string* contents);
 bool WriteToFile(const std::string& filename, const std::string& contents);
 bool ReadFromFile(const std::string& filename, rapidjson::Document* document);
 bool WriteToFile(const std::string& filename, const rapidjson::Document& document);
-std::string JsonValueToString(const rapidjson::Value& value);
 
 }  // namespace io
 }  // namespace util

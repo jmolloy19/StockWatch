@@ -1,71 +1,114 @@
 #include "stockwatch/stock_watch.h"
 
-#include <string_view>
+#include <thread>
 
 #include "curl/curl.h"
 #include "glog/logging.h"
 #include "rapidjson/error/en.h"
 
 #include "stockwatch/util/io/io.h"
+#include "stockwatch/util/json/json.h"
+#include "stockwatch/util/time/time.h"
 
 namespace stockwatch {
 
-StockWatch::StockWatch(const std::string& api_key) : finnhub_(std::make_shared<Finnhub>(api_key)) {}
+StockWatch::StockWatch(const Options& options) : finnhub_(options.api_key), options_(options) {}
 
 StockWatch::~StockWatch() { curl_global_cleanup(); }
 
 void StockWatch::Run() {
-    InitStockList();
+    Init();
+
+    std::vector<std::thread> additional_processing_threads;
 
     for (uint i = 1; i < std::thread::hardware_concurrency(); i++) {
-        additional_processing_threads_.emplace_back(&stockwatch::StockWatch::ProcessStockList, this);
+        additional_processing_threads.emplace_back(&stockwatch::StockWatch::ProcessStocks, this);
     }
 
-    ProcessStockList();
+    ProcessStocks();
 
-    for (auto& thread : additional_processing_threads_) {
+    for (auto& thread : additional_processing_threads) {
         thread.join();
     }
+
+    PrintResults();
 }
 
-void StockWatch::InitStockList() {
-    rapidjson::Document securities = finnhub_->RequestUsSecurities();
+void StockWatch::Init() {
+    std::lock_guard<std::mutex> lock(mtx_);
+
+    rapidjson::Document securities;
+    securities.Parse(finnhub_.RequestUsSecurities().c_str());
+
+    LOG_IF(FATAL, securities.HasParseError())
+        << "JSON parse error: " << rapidjson::GetParseError_En(securities.GetParseError()) << " "
+        << util::json::ToString(securities);
 
     for (const auto& security : securities.GetArray()) {
         if (ShouldProcess(security)) {
-            stock_list_.emplace_back(security, finnhub_);
+            stocks_.emplace_back(security);
         }
     }
 
-    next_stock_to_process_ = stock_list_.begin();
+    next_stock_to_process_ = stocks_.begin();
+
+    LOG(INFO) << "----- StockWatch Configuration -----";
+    LOG(INFO) << "Read From File:          " << (options_.read_from_file ? "true" : "false");
+    LOG(INFO) << "Write To File:           " << (options_.write_to_file ? "true" : "false");
+    LOG(INFO) << "Log Verbosity:           " << FLAGS_v;
+    LOG(INFO) << "API limit (calls/min):   " << 60;
+    LOG(INFO) << "Exchange:                " << "US";
+    LOG(INFO) << "Stocks on exchange:      " << securities.Size();
+    LOG(INFO) << "MIC Codes:               " << "XNMS, XNCM, XNGS, XNYS";
+    LOG(INFO) << "                         ";
+    LOG(INFO) << "Total Stocks to process: " << stocks_.size();
+    LOG(INFO) << "------------------------------------";
 }
 
-void StockWatch::ProcessStockList() {
-    auto stock = GetNextStockInList();
+void StockWatch::ProcessStocks() {
+    auto stock = GetNextStock();
 
-    while (stock != stock_list_.end()) {
-        stock->InitCandles(NumDaysAgo(150), Now());
+    while (stock != stocks_.end()) {
+        std::string json = GetCandlesJson(stock->Symbol());
+
+        stock->ParseCandlesFromJson(json);
 
         if (stock->ExhibitsHighTightFlag()) {
-            AddStockToHighTighFlags(stock);
+            AddToHighTighFlags(std::move(*stock));
         }
 
-        stock = GetNextStockInList();
+        stock = GetNextStock();
     }
 }
 
-std::vector<Stock>::iterator StockWatch::GetNextStockInList() {
+std::vector<Stock>::iterator StockWatch::GetNextStock() {
     std::lock_guard<std::mutex> lock(mtx_);
-    LOG_EVERY_N(INFO, 100) << google::COUNTER << "/" << stock_list_.size() << " stocks processed.";
+    LOG_EVERY_N(INFO, 100) << google::COUNTER << "/" << stocks_.size() << " stocks processed.";
 
-    return next_stock_to_process_ == stock_list_.end() ? stock_list_.end() : next_stock_to_process_++;
+    return next_stock_to_process_ == stocks_.end() ? stocks_.end() : next_stock_to_process_++;
 }
 
-void StockWatch::AddStockToHighTighFlags(std::vector<Stock>::const_iterator stock) {
+std::string StockWatch::GetCandlesJson(const std::string& symbol) {
+    std::string json;
+
+    if (options_.read_from_file) {
+        util::io::ReadFromFile("/home/jmolloy/Biometrics/StockWatch/Build/jsons/" + symbol + ".json", &json);
+    } else {
+        std::lock_guard<std::mutex> lock(mtx_);
+        json = finnhub_.RequestCandles(symbol, util::time::NumDaysAgo(150), util::time::Now());
+    }
+
+    if (options_.write_to_file) {
+        util::io::WriteToFile("/home/jmolloy/Biometrics/StockWatch/Build/jsons/" + symbol + ".json", json);
+    }
+
+    return json;
+}
+
+void StockWatch::AddToHighTighFlags(Stock&& stock) {
     std::lock_guard<std::mutex> lock(mtx_);
-    LOG(INFO) << "!!!!!! HTF !!!!!!: " << stock->Symbol();
-    
-    high_tight_flags_.push_back(stock);
+    VLOG(1) << "HTF: " << stock.Symbol();
+    high_tight_flags_.emplace_back(std::move(stock));
 }
 
 bool StockWatch::ShouldProcess(const rapidjson::Value& security) {
@@ -74,7 +117,7 @@ bool StockWatch::ShouldProcess(const rapidjson::Value& security) {
     CHECK(security.HasMember("type"));
     CHECK(security.HasMember("mic"));
 
-    return IsListedOnNasdaqOrNyse(security) and HasSupportedSymbol(security);
+    return IsListedOnNasdaqOrNyse(security) and HasValidSymbol(security);
 }
 
 bool StockWatch::IsListedOnNasdaqOrNyse(const rapidjson::Value& security) {
@@ -88,10 +131,10 @@ bool StockWatch::IsListedOnNasdaqOrNyse(const rapidjson::Value& security) {
     return mic == kNasdaqGlobalMkt or mic == kNasdaqCapitalMkt or mic == kNasdaqGlobalSelectMkt or mic == kNyse;
 }
 
-bool StockWatch::HasSupportedSymbol(const rapidjson::Value& security) {
+bool StockWatch::HasValidSymbol(const rapidjson::Value& security) {
     std::string_view symbol = security["symbol"].GetString();
 
-    if (symbol.size() < 1 or symbol.size() > 5) {
+    if (symbol.empty() or symbol.size() > 5) {
         return false;
     }
 
@@ -104,10 +147,13 @@ bool StockWatch::HasSupportedSymbol(const rapidjson::Value& security) {
     return true;
 }
 
-std::chrono::system_clock::time_point StockWatch::Now() { return std::chrono::system_clock::now(); }
+void StockWatch::PrintResults() const {
+    LOG(INFO) << "StockWatch finished successfully!";
+    LOG(INFO) << "----- High Tight Flags(" << high_tight_flags_.size() << ") -----";
 
-std::chrono::system_clock::time_point StockWatch::NumDaysAgo(int days) {
-    return std::chrono::system_clock::now() - std::chrono::hours(days * 24);
+    for (const auto& stock : high_tight_flags_) {
+        LOG(INFO) << stock.Symbol() << " (https://finance.yahoo.com/chart/" << stock.Symbol() << "/#ey)";
+    }
 }
 
 }  // namespace stockwatch

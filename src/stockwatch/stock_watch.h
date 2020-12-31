@@ -1,18 +1,23 @@
 #ifndef STOCKWATCH_STOCKWATCH_STOCKWATCH_H_
 #define STOCKWATCH_STOCKWATCH_STOCKWATCH_H_
 
-#include <mutex>
-#include <thread>
 #include <vector>
 
+#include "stockwatch/finnhub.h"
 #include "stockwatch/stock.h"
 
 namespace stockwatch {
 
+struct Options {
+    std::string api_key;
+    bool read_from_file{false};
+    bool write_to_file{false};
+};
+
 class StockWatch {
    public:
     StockWatch() = delete;
-    StockWatch(const std::string& api_key);
+    StockWatch(const Options& options);
     StockWatch(const StockWatch&) = delete;
     StockWatch& operator=(const StockWatch&) = delete;
     ~StockWatch();
@@ -20,26 +25,25 @@ class StockWatch {
     void Run();
 
    protected:
-    void InitStockList();
-    void ProcessStockList();
-    std::vector<Stock>::iterator GetNextStockInList();
-    void AddStockToHighTighFlags(std::vector<Stock>::const_iterator stock);
+    void Init();
+    void ProcessStocks();
+    std::vector<Stock>::iterator GetNextStock();
+    std::string GetCandlesJson(const std::string& symbol);
+    void AddToHighTighFlags(Stock&& stock);
+    void PrintResults() const;
 
     static bool ShouldProcess(const rapidjson::Value& security);
     static bool IsListedOnNasdaqOrNyse(const rapidjson::Value& security);
-    static bool HasSupportedSymbol(const rapidjson::Value& security);
-
-    static std::chrono::system_clock::time_point Now();
-    static std::chrono::system_clock::time_point NumDaysAgo(int days);
+    static bool HasValidSymbol(const rapidjson::Value& security);
 
    private:
     mutable std::mutex mtx_;
 
-    std::shared_ptr<Finnhub> finnhub_;
-    std::vector<Stock> stock_list_;
+    Finnhub finnhub_;
+    std::vector<Stock> stocks_;
     std::vector<Stock>::iterator next_stock_to_process_;
-    std::vector<std::vector<Stock>::const_iterator> high_tight_flags_;
-    std::vector<std::thread> additional_processing_threads_;
+    std::vector<Stock> high_tight_flags_;
+    const Options options_;
 };
 
 }  // namespace stockwatch

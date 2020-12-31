@@ -12,6 +12,7 @@ namespace util {
 namespace io {
 
 bool ReadFromFile(const std::string& filename, std::string* contents) {
+    contents->clear();
     std::ifstream in_file(filename, std::ios::ate);
 
     if (not in_file.is_open() or not in_file.good()) {
@@ -25,7 +26,7 @@ bool ReadFromFile(const std::string& filename, std::string* contents) {
     contents->resize(size);
     in_file.read(contents->data(), size);
 
-    return true;;
+    return true;
 }
 
 bool WriteToFile(const std::string& filename, const std::string& contents) {
@@ -38,7 +39,7 @@ bool WriteToFile(const std::string& filename, const std::string& contents) {
 
     out_file.write(contents.c_str(), contents.size());
 
-    return true;;
+    return true;
 }
 
 bool ReadFromFile(const std::string& filename, rapidjson::Document* document) {
@@ -69,16 +70,7 @@ bool WriteToFile(const std::string& filename, const rapidjson::Document& documen
 
     document.Accept(writer);
 
-    return true;;
-}
-
-std::string JsonValueToString(const rapidjson::Value& value) {
-    rapidjson::StringBuffer buffer;
-    rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
-
-    value.Accept(writer);
-
-    return buffer.GetString();
+    return true;
 }
 
 }  // namespace io
