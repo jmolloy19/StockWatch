@@ -30,20 +30,21 @@ class StockWatch {
     std::vector<Stock>::iterator GetNextStock();
     std::string GetCandlesJson(const std::string& symbol);
     void AddToHighTighFlags(Stock&& stock);
-    void PrintResults() const;
+    void LogResults() const;
 
     static bool ShouldProcess(const rapidjson::Value& security);
     static bool IsListedOnNasdaqOrNyse(const rapidjson::Value& security);
     static bool HasValidSymbol(const rapidjson::Value& security);
 
    private:
+    const Options options_;
+    
     mutable std::mutex mtx_;
 
     Finnhub finnhub_;
     std::vector<Stock> stocks_;
     std::vector<Stock>::iterator next_stock_to_process_;
     std::vector<Stock> high_tight_flags_;
-    const Options options_;
 };
 
 }  // namespace stockwatch

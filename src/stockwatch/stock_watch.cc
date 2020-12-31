@@ -12,7 +12,7 @@
 
 namespace stockwatch {
 
-StockWatch::StockWatch(const Options& options) : finnhub_(options.api_key), options_(options) {}
+StockWatch::StockWatch(const Options& options) : options_(options), finnhub_(options.api_key) {}
 
 StockWatch::~StockWatch() { curl_global_cleanup(); }
 
@@ -31,7 +31,7 @@ void StockWatch::Run() {
         thread.join();
     }
 
-    PrintResults();
+    LogResults();
 }
 
 void StockWatch::Init() {
@@ -147,7 +147,8 @@ bool StockWatch::HasValidSymbol(const rapidjson::Value& security) {
     return true;
 }
 
-void StockWatch::PrintResults() const {
+
+void StockWatch::LogResults() const {
     LOG(INFO) << "StockWatch finished successfully!";
     LOG(INFO) << "----- High Tight Flags(" << high_tight_flags_.size() << ") -----";
 
