@@ -18,40 +18,45 @@ struct Candle {
     int64_t timestamp{0};
 };
 
-float AverageClose(std::vector<Candle>::const_iterator first, std::vector<Candle>::const_iterator last);
+float AverageClose(std::vector<Candle>::const_iterator first,
+                   std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MinClose(std::vector<Candle>::const_iterator first,
                                              std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MaxClose(std::vector<Candle>::const_iterator first,
                                              std::vector<Candle>::const_iterator last);
 
-float AverageOpen(std::vector<Candle>::const_iterator first, std::vector<Candle>::const_iterator last);
+float AverageOpen(std::vector<Candle>::const_iterator first,
+                  std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MinOpen(std::vector<Candle>::const_iterator first,
                                             std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MaxOpen(std::vector<Candle>::const_iterator first,
                                             std::vector<Candle>::const_iterator last);
 
-float AverageHigh(std::vector<Candle>::const_iterator first, std::vector<Candle>::const_iterator last);
+float AverageHigh(std::vector<Candle>::const_iterator first,
+                  std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MinHigh(std::vector<Candle>::const_iterator first,
                                             std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MaxHigh(std::vector<Candle>::const_iterator first,
                                             std::vector<Candle>::const_iterator last);
 
-float AverageLow(std::vector<Candle>::const_iterator first, std::vector<Candle>::const_iterator last);
+float AverageLow(std::vector<Candle>::const_iterator first,
+                 std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MinLow(std::vector<Candle>::const_iterator first,
                                            std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MaxLow(std::vector<Candle>::const_iterator first,
                                            std::vector<Candle>::const_iterator last);
 
-int AverageVolume(std::vector<Candle>::const_iterator first, std::vector<Candle>::const_iterator last);
+int AverageVolume(std::vector<Candle>::const_iterator first,
+                  std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MinVolume(std::vector<Candle>::const_iterator first,
                                               std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MaxVolume(std::vector<Candle>::const_iterator first,
                                               std::vector<Candle>::const_iterator last);
 
-std::vector<Candle>::const_iterator FirstCandleAfter(const std::vector<Candle>& candles,
-                                                     const std::chrono::system_clock::time_point& time_point);
-std::vector<Candle>::const_iterator FirstCandleBefore(const std::vector<Candle>& candles,
-                                                      const std::chrono::system_clock::time_point& time_point);
+std::vector<Candle>::const_iterator FirstCandleAfter(
+    const std::vector<Candle>& candles, const std::chrono::system_clock::time_point& time_point);
+std::vector<Candle>::const_iterator FirstCandleBefore(
+    const std::vector<Candle>& candles, const std::chrono::system_clock::time_point& time_point);
 
 }  // namespace stockwatch
 #endif  // STOCKWATCH_CANDLE_H_

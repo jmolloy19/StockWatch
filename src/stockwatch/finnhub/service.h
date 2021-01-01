@@ -16,7 +16,8 @@ class Service {
     ~Service() = default;
 
     std::string RequestUsSecurities();
-    std::string RequestCandles(const std::string& symbol, const std::chrono::system_clock::time_point& from,
+    std::string RequestCandles(const std::string& symbol,
+                               const std::chrono::system_clock::time_point& from,
                                const std::chrono::system_clock::time_point& to);
 
    protected:
