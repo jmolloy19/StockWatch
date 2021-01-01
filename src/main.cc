@@ -8,7 +8,7 @@
 static cxxopts::Options BuildOptions() {
     cxxopts::Options options("StockWatch", "Scans US exchange for chart patterns.");
 
-    options.add_options()("k, api_key", "Finnhub API key. See https://finnhub.io/ for a free api key.",
+    options.add_options()("f, finnhub_api_key", "Finnhub API key. See https://finnhub.io/ for a free api key.",
                           cxxopts::value<std::string>());
     options.add_options()("v, verbose", "Verbosity level for googles verbose logging.",
                           cxxopts::value<int>()->default_value("0"));
@@ -48,7 +48,7 @@ static cxxopts::ParseResult ParseArgs(int argc, char** argv) {
         exit(0);
     }
 
-    if (args.count("api_key") != 1) {
+    if (args.count("finnhub_api_key") != 1) {
         std::cerr << "Missing required argument: api_key\n" << options.help();
         exit(0);
     }

@@ -5,7 +5,7 @@
 namespace stockwatch {
 
 Config::Config(const cxxopts::ParseResult& args)
-    : finnhub_api_key_(args["api_key"].as<std::string>()),
+    : finnhub_api_key_(args["finnhub_api_key"].as<std::string>()),
       write_to_file_(args["write_to_file"].as<bool>()),
       read_from_file_(args["read_from_file"].as<bool>()),
       db_name_(args["db_name"].as<std::string>()),

@@ -1,7 +1,7 @@
 find_package(glog)
 
 add_compile_definitions(STOCKWATCH_MIGRATIONS_DIR="${PROJECT_SOURCE_DIR}/src/stockwatch/postgres/migrations/")
-add_compile_definitions(STOCKWATCH_JSONS_DIR="${PROJECT_SOURCE_DIR}/Build/jsons/")
+add_compile_definitions(STOCKWATCH_JSONS_DIR="${PROJECT_SOURCE_DIR}/build/jsons/")
 
 add_executable(stockwatch
     main.cc
