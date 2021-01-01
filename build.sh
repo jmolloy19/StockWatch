@@ -3,7 +3,12 @@ set -eu
 rm -rf build || true
 mkdir build
 
-cd build
+pushd src
+find ./ -iname *.h -o -iname *.cc | xargs clang-format -i -style=file
+popd
+
+pushd build
 cmake ..
-make -j4
-cd -
+make -j6
+popd
+

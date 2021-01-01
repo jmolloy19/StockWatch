@@ -21,7 +21,6 @@ class Stock {
     bool ExhibitsHighTightFlag() const;
 
     const std::string& Symbol() const;
-    const std::string& Description() const;
     const std::string& MicCode() const;
     const std::vector<Candle>& Candles() const;
 
@@ -32,7 +31,6 @@ class Stock {
 
    private:
     const std::string symbol_;
-    const std::string description_;
     const std::string mic_code_;
 
     std::vector<Candle> candles_;

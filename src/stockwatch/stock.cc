@@ -2,14 +2,13 @@
 
 #include "rapidjson/error/en.h"
 
-#include "stockwatch/pattern/high_tight_flag.h"
+#include "stockwatch/patterns/high_tight_flag.h"
 #include "stockwatch/util/json/json.h"
 
 namespace stockwatch {
 
 Stock::Stock(const rapidjson::Value& security)
     : symbol_(security["symbol"].GetString()),
-      description_(security["description"].GetString()),
       mic_code_(security["mic"].GetString()) {}
 
 void Stock::ParseCandlesFromJson(const std::string& json) {
@@ -46,12 +45,10 @@ bool Stock::ExhibitsHighTightFlag() const {
         return false;
     }
 
-    return pattern::HighTightFlag::ExhibitsPattern(candles_);
+    return patterns::HighTightFlag::ExhibitsPattern(candles_);
 }
 
 const std::string& Stock::Symbol() const { return symbol_; }
-
-const std::string& Stock::Description() const { return description_; }
 
 const std::string& Stock::MicCode() const { return mic_code_; }
 

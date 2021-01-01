@@ -1,23 +1,19 @@
-#ifndef STOCKWATCH_STOCKWATCH_STOCKWATCH_H_
-#define STOCKWATCH_STOCKWATCH_STOCKWATCH_H_
+#ifndef STOCKWATCH_STOCKWATCH_H_
+#define STOCKWATCH_STOCKWATCH_H_
 
 #include <vector>
 
-#include "stockwatch/finnhub.h"
+#include "stockwatch/config.h"
+#include "stockwatch/finnhub/service.h"
+#include "stockwatch/postgres/data_base.h"
 #include "stockwatch/stock.h"
 
 namespace stockwatch {
 
-struct Options {
-    std::string api_key;
-    bool read_from_file{false};
-    bool write_to_file{false};
-};
-
 class StockWatch {
    public:
     StockWatch() = delete;
-    StockWatch(const Options& options);
+    StockWatch(const Config& config);
     StockWatch(const StockWatch&) = delete;
     StockWatch& operator=(const StockWatch&) = delete;
     ~StockWatch();
@@ -37,15 +33,16 @@ class StockWatch {
     static bool HasValidSymbol(const rapidjson::Value& security);
 
    private:
-    const Options options_;
+    const Config config_;
     
-    mutable std::mutex mtx_;
+    mutable std::mutex mutex_;
 
-    Finnhub finnhub_;
+    finnhub::Service finnhub_service_;
+    postgres::DataBase postgres_data_base_;
     std::vector<Stock> stocks_;
-    std::vector<Stock>::iterator next_stock_to_process_;
+    std::vector<Stock>::iterator stocks_iterator_;
     std::vector<Stock> high_tight_flags_;
 };
 
 }  // namespace stockwatch
-#endif  // STOCKWATCH_STOCKWATCH_STOCKWATCH_H_
+#endif  // STOCKWATCH_STOCKWATCH_H_

@@ -8,6 +8,18 @@ namespace stockwatch {
 namespace util {
 namespace postgres {
 
+class Insert {
+    public:
+     Insert() = default;
+     ~Insert() = default;
+
+     Insert& Into(const std::string& table) {
+         statement_.c;
+     }
+
+    private:
+     std::stringstream statement_;
+};
 class Query {
     public:
     std::string ToString() const { return QueryStream().str(); }

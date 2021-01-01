@@ -11,29 +11,33 @@ namespace stockwatch {
 namespace util {
 namespace io {
 
-bool ReadFromFile(const std::string& filename, std::string* contents) {
-    contents->clear();
-    std::ifstream in_file(filename, std::ios::ate);
+bool ReadFromFile(const std::experimental::filesystem::path& path, std::string* contents) {
+    std::ifstream in_file(path, std::ios::ate);
 
     if (not in_file.is_open() or not in_file.good()) {
-        LOG(ERROR) << "Failed opening file to read_from: " << filename << ": good=" << in_file.good();
+        LOG(FATAL) << "Failed opening file to read from: " << path;
         return false;
     }
 
     size_t size = in_file.tellg();
     in_file.seekg(0);
 
+    contents->clear();
     contents->resize(size);
     in_file.read(contents->data(), size);
 
     return true;
 }
 
-bool WriteToFile(const std::string& filename, const std::string& contents) {
-    std::ofstream out_file(filename);
+bool WriteToFile(const std::experimental::filesystem::path& path, const std::string& contents) {
+    if (not std::experimental::filesystem::exists(path.parent_path())) {
+        LOG_IF(FATAL, not std::experimental::filesystem::create_directories(path.parent_path())) << "Failed creating parent directoris for path: " << path;
+    }
+
+    std::ofstream out_file(path);
 
     if (not out_file.is_open() or not out_file.good()) {
-        LOG(ERROR) << "Failed opening file to write to: " << filename << ": good=" << out_file.good();
+        LOG(FATAL) << "Failed opening file to write to: " << path << ": good=" << out_file.good();
         return false;
     }
 
@@ -42,11 +46,11 @@ bool WriteToFile(const std::string& filename, const std::string& contents) {
     return true;
 }
 
-bool ReadFromFile(const std::string& filename, rapidjson::Document* document) {
-    std::ifstream in_file(filename);
+bool ReadFromFile(const std::experimental::filesystem::path& path, rapidjson::Document* document) {
+    std::ifstream in_file(path);
 
     if (not in_file.is_open() or not in_file.good()) {
-        LOG(ERROR) << "Failed opening file to read_from: " << filename << ": good=" << in_file.good();
+        LOG(FATAL) << "Failed opening file to read from: " << path;
         return false;
     }
 
@@ -57,11 +61,15 @@ bool ReadFromFile(const std::string& filename, rapidjson::Document* document) {
     return true;
 }
 
-bool WriteToFile(const std::string& filename, const rapidjson::Document& document) {
-    std::ofstream out_file(filename);
+bool WriteToFile(const std::experimental::filesystem::path& path, const rapidjson::Document& document) {
+    if (not std::experimental::filesystem::exists(path.parent_path())) {
+        LOG_IF(FATAL, not std::experimental::filesystem::create_directories(path.parent_path())) << "Failed creating parent directoris for path: " << path;
+    }
+
+    std::ofstream out_file(path);
 
     if (not out_file.is_open() or not out_file.good()) {
-        LOG(ERROR) << "Failed opening file to write to: " << filename << ": good=" << out_file.good();
+        LOG(FATAL) << "Failed opening file to write to: " << path;
         return false;
     }
 

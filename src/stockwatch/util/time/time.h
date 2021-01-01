@@ -10,8 +10,13 @@ namespace time {
 
 std::chrono::system_clock::time_point Now();
 std::chrono::system_clock::time_point NumDaysAgo(int days);
-std::string ToString(const std::chrono::system_clock::time_point& time_point);
-std::chrono::system_clock::time_point FromString(const std::string& unix_time);
+std::chrono::system_clock::time_point ToTimePoint(int64_t unix_time);
+
+int64_t ToUnixTime(const std::string& unix_time);
+int64_t ToUnixTime(const std::chrono::system_clock::time_point& time_point);
+
+
+
 
 }  // namespace time
 }  // namespace util

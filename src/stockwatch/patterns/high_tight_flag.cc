@@ -1,9 +1,9 @@
-#include "stockwatch/pattern/high_tight_flag.h"
+#include "stockwatch/patterns/high_tight_flag.h"
 
 #include "glog/logging.h"
 
 namespace stockwatch {
-namespace pattern {
+namespace patterns {
 
 bool HighTightFlag::ExhibitsPattern(const std::vector<Candle>& candles) {
     auto flag_pole_bottom = FlagPoleBottom(candles);
@@ -53,5 +53,5 @@ std::vector<Candle>::const_iterator HighTightFlag::FlagPoleTop(const std::vector
     return MaxHigh(candles.cend() - 60, candles.cend()); 
 }
 
-}  // namespace pattern
+}  // namespace patterns
 }  // namespace stockwatch

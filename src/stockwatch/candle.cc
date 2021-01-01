@@ -4,6 +4,8 @@
 
 #include "glog/logging.h"
 
+#include "stockwatch/util/time/time.h"
+
 namespace stockwatch {
 
 float AverageClose(std::vector<Candle>::const_iterator first, std::vector<Candle>::const_iterator last) {
@@ -123,6 +125,18 @@ std::vector<Candle>::const_iterator MinVolume(std::vector<Candle>::const_iterato
 std::vector<Candle>::const_iterator MaxVolume(std::vector<Candle>::const_iterator first,
                                               std::vector<Candle>::const_iterator last) {
     return std::max_element(first, last, [](const Candle& a, const Candle& b) { return a.volume < b.volume; });
+}
+
+std::vector<Candle>::const_iterator FirstCandleAfter(const std::vector<Candle>& candles,
+                                                     const std::chrono::system_clock::time_point& time_point) {
+    return std::find_if(candles.cbegin(), candles.cend(),
+                        [&](const Candle& a) { return a.timestamp > util::time::ToUnixTime(time_point); });
+}
+
+std::vector<Candle>::const_iterator FirstCandleBefore(const std::vector<Candle>& candles,
+                                                      const std::chrono::system_clock::time_point& time_point) {
+    return std::find_if_not(candles.cbegin(), candles.cend(),
+                            [&](const Candle& a) { return a.timestamp < util::time::ToUnixTime(time_point); });
 }
 
 }  // namespace stockwatch

@@ -1,7 +1,7 @@
 #ifndef STOCKWATCH_CANDLE_H_
 #define STOCKWATCH_CANDLE_H_
 
-#include <cstdint>
+#include <chrono>
 #include <vector>
 
 namespace stockwatch {
@@ -47,6 +47,11 @@ std::vector<Candle>::const_iterator MinVolume(std::vector<Candle>::const_iterato
                                               std::vector<Candle>::const_iterator last);
 std::vector<Candle>::const_iterator MaxVolume(std::vector<Candle>::const_iterator first,
                                               std::vector<Candle>::const_iterator last);
+
+std::vector<Candle>::const_iterator FirstCandleAfter(const std::vector<Candle>& candles,
+                                                     const std::chrono::system_clock::time_point& time_point);
+std::vector<Candle>::const_iterator FirstCandleBefore(const std::vector<Candle>& candles,
+                                                      const std::chrono::system_clock::time_point& time_point);
 
 }  // namespace stockwatch
 #endif  // STOCKWATCH_CANDLE_H_
