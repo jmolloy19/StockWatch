@@ -15,9 +15,6 @@ std::chrono::system_clock::time_point ToTimePoint(int64_t unix_time);
 int64_t ToUnixTime(const std::string& unix_time);
 int64_t ToUnixTime(const std::chrono::system_clock::time_point& time_point);
 
-
-
-
 }  // namespace time
 }  // namespace util
 }  // namespace stockwatch

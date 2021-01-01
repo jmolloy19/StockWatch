@@ -34,7 +34,7 @@ class StockWatch {
 
    private:
     const Config config_;
-    
+
     mutable std::mutex mutex_;
 
     finnhub::Service finnhub_service_;

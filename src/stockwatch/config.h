@@ -8,7 +8,7 @@
 namespace stockwatch {
 
 class Config {
-    public:
+   public:
     Config() = delete;
     Config(const cxxopts::ParseResult& args);
     ~Config() = default;
@@ -21,7 +21,7 @@ class Config {
     bool IsWriteToFile() const;
     bool IsReadFromFile() const;
 
-    private:
+   private:
     const std::string finnhub_api_key_;
     const std::experimental::filesystem::path jsons_dir_{STOCKWATCH_JSONS_DIR};
 
@@ -33,7 +33,6 @@ class Config {
     const std::string db_password_;
     const std::string db_address_;
     const std::string db_port_;
-
 };
 
 }  // namespace stockwatch

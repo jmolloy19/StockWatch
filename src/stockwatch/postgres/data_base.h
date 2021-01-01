@@ -3,8 +3,8 @@
 
 #include <experimental/filesystem>
 #include <mutex>
-#include <string>
 #include <pqxx/pqxx>
+#include <string>
 
 #include "stockwatch/stock.h"
 
@@ -12,7 +12,7 @@ namespace stockwatch {
 namespace postgres {
 
 class DataBase {
-public:
+   public:
     DataBase() = delete;
     DataBase(const std::string& connection_string);
     ~DataBase() = default;
@@ -20,7 +20,7 @@ public:
     void CreateIfNotExists();
     void InsertHighTightFlag(const Stock& stock);
 
-    private:
+   private:
     static const std::experimental::filesystem::path kMigrationsDir;
 
     mutable std::mutex mutex_;
