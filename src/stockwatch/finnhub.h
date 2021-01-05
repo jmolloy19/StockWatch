@@ -1,5 +1,5 @@
-#ifndef STOCKWATCH_FINNHUB_SERVICE_H_
-#define STOCKWATCH_FINNHUB_SERVICE_H_
+#ifndef STOCKWATCH_FINNHUB_H_
+#define STOCKWATCH_FINNHUB_H_
 
 #include <chrono>
 #include <condition_variable>
@@ -7,13 +7,12 @@
 #include <string>
 
 namespace stockwatch {
-namespace finnhub {
 
-class Service {
+class Finnhub {
    public:
-    Service() = delete;
-    Service(const std::string& api_key);
-    ~Service() = default;
+    Finnhub() = delete;
+    Finnhub(const std::string& api_key);
+    ~Finnhub() = default;
 
     std::string RequestUsSecurities();
     std::string RequestCandles(const std::string& symbol,
@@ -33,6 +32,5 @@ class Service {
     std::chrono::system_clock::time_point next_call_time_;
 };
 
-}  // namespace finnhub
 }  // namespace stockwatch
-#endif  // STOCKWATCH_FINNHUB_SERVICE_H_
+#endif  // STOCKWATCH_FINNHUB_H_

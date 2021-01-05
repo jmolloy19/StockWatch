@@ -3,7 +3,6 @@
 #include "glog/logging.h"
 
 namespace stockwatch {
-namespace patterns {
 
 bool HighTightFlag::ExhibitsPattern(const std::vector<Candle>& candles) {
     auto flag_pole_bottom = FlagPoleBottom(candles);
@@ -53,5 +52,4 @@ std::vector<Candle>::const_iterator HighTightFlag::FlagPoleTop(const std::vector
     return MaxHigh(candles.cend() - 60, candles.cend()); 
 }
 
-}  // namespace patterns
 }  // namespace stockwatch

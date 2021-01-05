@@ -1,20 +1,19 @@
 find_package(glog)
 
-add_compile_definitions(STOCKWATCH_MIGRATIONS_DIR="${PROJECT_SOURCE_DIR}/src/stockwatch/postgres/migrations/")
-add_compile_definitions(STOCKWATCH_JSONS_DIR="${PROJECT_SOURCE_DIR}/build/jsons/")
-
 add_executable(stockwatch
     main.cc
     stockwatch/stock_watch.cc
     stockwatch/stock.cc
     stockwatch/candle.cc
     stockwatch/config.cc
-    stockwatch/finnhub/service.cc
+    stockwatch/finnhub.cc
     stockwatch/patterns/high_tight_flag.cc
+    stockwatch/patterns/pattern.cc
     stockwatch/postgres/data_base.cc
     stockwatch/util/io/io.cc
     stockwatch/util/json/json.cc
-    stockwatch/util/curl/curl.cc
+    stockwatch/util/curl/http.cc
+    stockwatch/util/curl/email.cc
     stockwatch/util/time/time.cc
 )
     

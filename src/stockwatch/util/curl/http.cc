@@ -1,4 +1,4 @@
-#include "curl.h"
+#include "http.h"
 
 #include "curl/curl.h"
 #include "glog/logging.h"
@@ -7,7 +7,7 @@ namespace stockwatch {
 namespace util {
 namespace curl {
 
-void MakeRequest(const std::string& url, std::string* response) {
+void Http::Request(const std::string& url, std::string* response) {
     CHECK_NOTNULL(response);
 
     CURL* curl = curl_easy_init();
@@ -30,11 +30,11 @@ void MakeRequest(const std::string& url, std::string* response) {
     }
 }
 
-size_t Callback(void* contents, size_t size, size_t nmemb, void* userp) {
+size_t Http::Callback(void* ptr, size_t size, size_t nmemb, void* userp) {
     try {
-        static_cast<std::string*>(userp)->append(static_cast<char*>(contents), size * nmemb);
-    } catch (std::bad_alloc& err) {
-        LOG(ERROR) << "Memory allocation failed. Error: " << err.what();
+        reinterpret_cast<std::string*>(userp)->append(reinterpret_cast<char*>(ptr), size * nmemb);
+    } catch (const std::exception& e) {
+        LOG(ERROR) << e.what();
         return 0;
     }
 

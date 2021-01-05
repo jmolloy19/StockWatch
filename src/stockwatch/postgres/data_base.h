@@ -5,8 +5,10 @@
 #include <mutex>
 #include <pqxx/pqxx>
 #include <string>
+#include <unordered_set>
 
 #include "stockwatch/stock.h"
+#include "stockwatch/patterns/pattern.h"
 
 namespace stockwatch {
 namespace postgres {
@@ -17,15 +19,27 @@ class DataBase {
     DataBase(const std::string& connection_string);
     ~DataBase() = default;
 
-    void CreateIfNotExists();
-    void InsertHighTightFlag(const Stock& stock);
+    void Init();
+    bool IsCurrentlyWatched(const std::string& symbol) const;
+    void InsertNewCandles(const Stock& stock);
+    void WatchStock(const Stock& stock, Pattern pattern);
+    
+    const std::vector<std::pair<std::string, Pattern>>& NewlyWatchedPatterns() const;
+    pqxx::result QueryAllWatchedPatterns() const;
+
+   protected:
+    pqxx::connection Connect() const;
+    void CreateDbIfNotExists() const;
+    void InitCurrentlyWatchedStocks();
 
    private:
     static const std::experimental::filesystem::path kMigrationsDir;
+    const std::string connection_string_;
 
     mutable std::mutex mutex_;
 
-    pqxx::connection connection_;
+    std::vector<std::pair<std::string, Pattern>> newly_watched_patterns_;
+    std::unordered_set<std::string> currently_watched_stocks_;
 };
 
 }  // namespace postgres

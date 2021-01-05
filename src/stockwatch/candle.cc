@@ -1,6 +1,7 @@
 #include "stockwatch/candle.h"
 
 #include <algorithm>
+#include <cmath>
 
 #include "glog/logging.h"
 
@@ -20,6 +21,25 @@ float AverageClose(std::vector<Candle>::const_iterator first, std::vector<Candle
     }
 
     return total / std::distance(first, last);
+}
+
+float ClosesResidualStandardDeviation(std::vector<Candle>::const_iterator first, std::vector<Candle>::const_iterator last) {
+    DCHECK(std::distance(first, last) > 2);
+
+    int n = std::distance(first, last);
+    float b = first->close;
+    float slope = (last->close - b) / n;
+
+    float residual_squared_sum = 0;
+
+    for (int x = 1; x <= n - 1; x++) {
+        float estimated = slope * x + b;
+        float actual = (first + x)->close;
+        
+        residual_squared_sum += std::pow(2, actual - estimated);
+    }
+
+    return std::sqrt(residual_squared_sum / (n - 2));
 }
 
 std::vector<Candle>::const_iterator MinClose(std::vector<Candle>::const_iterator first,

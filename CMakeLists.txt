@@ -7,6 +7,8 @@ project(StockWatch)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
 
 add_compile_options(-Wall -Wextra -pedantic)
+add_compile_definitions(STOCKWATCH_MIGRATIONS_DIR="${PROJECT_SOURCE_DIR}/src/stockwatch/postgres/migrations/")
+add_compile_definitions(STOCKWATCH_JSONS_DIR="${PROJECT_SOURCE_DIR}/jsons/")
 
 add_subdirectory(src)
 

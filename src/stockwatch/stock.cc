@@ -45,7 +45,7 @@ bool Stock::ExhibitsHighTightFlag() const {
         return false;
     }
 
-    return patterns::HighTightFlag::ExhibitsPattern(candles_);
+    return HighTightFlag::ExhibitsPattern(candles_);
 }
 
 const std::string& Stock::Symbol() const { return symbol_; }

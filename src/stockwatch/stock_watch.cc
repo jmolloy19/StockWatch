@@ -13,12 +13,14 @@
 namespace stockwatch {
 
 StockWatch::StockWatch(const Config& config)
-    : config_(config), finnhub_service_(config_.FinnhubApiKey()), postgres_data_base_(config_.DbConnectionString()) {}
+    : config_(config),
+      finnhub_(config_.FinnhubApiKey()),
+      data_base_(config_.DbConnectionString()) {}
 
 StockWatch::~StockWatch() { curl_global_cleanup(); }
 
 void StockWatch::Run() {
-    config_.Log();
+    config_.LogConfig();
     Init();
 
     std::vector<std::thread> additional_processing_threads;
@@ -39,7 +41,7 @@ void StockWatch::Init() {
     std::lock_guard<std::mutex> lock(mutex_);
 
     rapidjson::Document securities;
-    securities.Parse(finnhub_service_.RequestUsSecurities().c_str());
+    securities.Parse(finnhub_.RequestUsSecurities().c_str());
 
     LOG_IF(FATAL, securities.HasParseError())
         << "JSON parse error: " << rapidjson::GetParseError_En(securities.GetParseError()) << " "
@@ -52,40 +54,48 @@ void StockWatch::Init() {
     }
 
     stocks_iterator_ = stocks_.begin();
-    postgres_data_base_.CreateIfNotExists();
+    data_base_.Init();
 }
 
 void StockWatch::ProcessStocks() {
-    auto stock = GetNextStock();
+    auto stock = GetNextStockToProcess();
 
     while (stock != stocks_.end()) {
-        std::string json = GetCandlesJson(stock->Symbol());
+        std::string json = GetStockCandlesJson(stock->Symbol());
 
         stock->ParseCandlesFromJson(json);
 
-        if (stock->ExhibitsHighTightFlag()) {
-            AddToHighTighFlags(std::move(*stock));
+        if (data_base_.IsCurrentlyWatched(stock->Symbol())) {
+            std::lock_guard<std::mutex> lock(mutex_);
+            data_base_.InsertNewCandles(*stock);
         }
 
-        stock = GetNextStock();
+        if (stock->ExhibitsHighTightFlag()) {
+            std::lock_guard<std::mutex> lock(mutex_);
+            VLOG(1) << "HTF: " << stock->Symbol();
+            data_base_.WatchStock(*stock, Pattern::kHighTightFlag);
+        }
+
+        stock = GetNextStockToProcess();
     }
 }
 
-std::vector<Stock>::iterator StockWatch::GetNextStock() {
+std::vector<Stock>::iterator StockWatch::GetNextStockToProcess() {
     std::lock_guard<std::mutex> lock(mutex_);
     LOG_EVERY_N(INFO, 100) << google::COUNTER << "/" << stocks_.size() << " stocks processed.";
 
     return stocks_iterator_ != stocks_.end() ? stocks_iterator_++ : stocks_.end();
 }
 
-std::string StockWatch::GetCandlesJson(const std::string& symbol) {
+std::string StockWatch::GetStockCandlesJson(const std::string& symbol) {
     std::string json;
 
     if (config_.IsReadFromFile()) {
         util::io::ReadFromFile(config_.JsonsDir().string() + symbol + ".json", &json);
     } else {
         std::lock_guard<std::mutex> lock(mutex_);
-        json = finnhub_service_.RequestCandles(symbol, util::time::NumDaysAgo(150), util::time::Now());
+        json = finnhub_.RequestCandles(symbol, util::time::NumDaysAgo(150),
+                                       std::chrono::system_clock::now());
     }
 
     if (config_.IsWriteToFile()) {
@@ -93,13 +103,6 @@ std::string StockWatch::GetCandlesJson(const std::string& symbol) {
     }
 
     return json;
-}
-
-void StockWatch::AddToHighTighFlags(Stock&& stock) {
-    std::lock_guard<std::mutex> lock(mutex_);
-    VLOG(1) << "HTF: " << stock.Symbol();
-    postgres_data_base_.InsertHighTightFlag(stock);
-    high_tight_flags_.emplace_back(std::move(stock));
 }
 
 bool StockWatch::ShouldProcess(const rapidjson::Value& security) {
@@ -117,7 +120,8 @@ bool StockWatch::IsListedOnNasdaqOrNyse(const rapidjson::Value& security) {
 
     std::string_view mic = security["mic"].GetString();
 
-    return mic == kNasdaqGlobalMkt or mic == kNasdaqCapitalMkt or mic == kNasdaqGlobalSelectMkt or mic == kNyse;
+    return mic == kNasdaqGlobalMkt or mic == kNasdaqCapitalMkt or mic == kNasdaqGlobalSelectMkt or
+           mic == kNyse;
 }
 
 bool StockWatch::HasValidSymbol(const rapidjson::Value& security) {
@@ -138,10 +142,20 @@ bool StockWatch::HasValidSymbol(const rapidjson::Value& security) {
 
 void StockWatch::LogResults() const {
     LOG(INFO) << "StockWatch finished successfully!";
-    LOG(INFO) << "----- High Tight Flags(" << high_tight_flags_.size() << ") -----";
 
-    for (const auto& stock : high_tight_flags_) {
-        LOG(INFO) << stock.Symbol() << " (https://finance.yahoo.com/chart/" << stock.Symbol() << "/#ey)";
+    const auto& newly_watched_patterns = data_base_.NewlyWatchedPatterns();
+
+    LOG(INFO) << "----- Newly Watched Patterns(" << newly_watched_patterns.size() << ") -----";
+    for (const auto& [symbol, pattern] : newly_watched_patterns) {
+        LOG(INFO) << symbol << ": " << ToString(pattern);
+    }
+
+    pqxx::result watched_patterns = data_base_.QueryAllWatchedPatterns();
+
+    LOG(INFO) << "----- All Watched Patterns(" << watched_patterns.size() << ") -----";
+    for (const auto& row : watched_patterns) {
+        std::string symbol = row.at("symbol").as<std::string>();
+        LOG(INFO) << symbol << ": (https://finance.yahoo.com/chart/" << symbol << "/#ey)";
     }
 }
 

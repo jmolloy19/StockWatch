@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "stockwatch/config.h"
-#include "stockwatch/finnhub/service.h"
+#include "stockwatch/finnhub.h"
 #include "stockwatch/postgres/data_base.h"
 #include "stockwatch/stock.h"
 
@@ -15,7 +15,6 @@ class StockWatch {
     StockWatch() = delete;
     StockWatch(const Config& config);
     StockWatch(const StockWatch&) = delete;
-    StockWatch& operator=(const StockWatch&) = delete;
     ~StockWatch();
 
     void Run();
@@ -23,9 +22,8 @@ class StockWatch {
    protected:
     void Init();
     void ProcessStocks();
-    std::vector<Stock>::iterator GetNextStock();
-    std::string GetCandlesJson(const std::string& symbol);
-    void AddToHighTighFlags(Stock&& stock);
+    std::vector<Stock>::iterator GetNextStockToProcess();
+    std::string GetStockCandlesJson(const std::string& symbol);
     void LogResults() const;
 
     static bool ShouldProcess(const rapidjson::Value& security);
@@ -37,11 +35,10 @@ class StockWatch {
 
     mutable std::mutex mutex_;
 
-    finnhub::Service finnhub_service_;
-    postgres::DataBase postgres_data_base_;
+    Finnhub finnhub_;
+    postgres::DataBase data_base_;
     std::vector<Stock> stocks_;
     std::vector<Stock>::iterator stocks_iterator_;
-    std::vector<Stock> high_tight_flags_;
 };
 
 }  // namespace stockwatch

@@ -4,7 +4,6 @@
 #include "stockwatch/candle.h"
 
 namespace stockwatch {
-namespace patterns {
 
 class HighTightFlag {
    public:
@@ -16,6 +15,5 @@ class HighTightFlag {
     static std::vector<Candle>::const_iterator FlagPoleTop(const std::vector<Candle>& candles);
 };
 
-}  // namespace patterns
 }  // namespace stockwatch
 #endif  // STOCKWATCH_PATTERNS_HIGH_TIGHT_FLAG_H_
