@@ -25,7 +25,7 @@ std::vector<Candle>::const_iterator MaxClose(std::vector<Candle>::const_iterator
 std::vector<Candle>::const_iterator MinClose(std::vector<Candle>::const_iterator first,
                                              std::vector<Candle>::const_iterator last);
 float ClosesResidualStandardDeviation(std::vector<Candle>::const_iterator first,
-                                             std::vector<Candle>::const_iterator last);
+                                      std::vector<Candle>::const_iterator last);
 
 float AverageOpen(std::vector<Candle>::const_iterator first,
                   std::vector<Candle>::const_iterator last);

@@ -8,10 +8,10 @@ namespace util {
 namespace curl {
 
 class Http {
-    public:
-     Http() = default;
-     ~Http() = default;
-     
+   public:
+    Http() = default;
+    ~Http() = default;
+
     static void Request(const std::string& url, std::string* response);
     static size_t Callback(void* ptr, size_t size, size_t nmemb, void* userp);
 };

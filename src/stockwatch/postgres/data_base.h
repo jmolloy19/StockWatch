@@ -7,8 +7,8 @@
 #include <string>
 #include <unordered_set>
 
-#include "stockwatch/stock.h"
 #include "stockwatch/patterns/pattern.h"
+#include "stockwatch/stock.h"
 
 namespace stockwatch {
 namespace postgres {
@@ -23,7 +23,7 @@ class DataBase {
     bool IsCurrentlyWatched(const std::string& symbol) const;
     void InsertNewCandles(const Stock& stock);
     void WatchStock(const Stock& stock, Pattern pattern);
-    
+
     const std::vector<std::pair<std::string, Pattern>>& NewlyWatchedPatterns() const;
     pqxx::result QueryAllWatchedPatterns() const;
 
