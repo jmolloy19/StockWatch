@@ -22,9 +22,9 @@ void Http::Request(const std::string& url, std::string* response) {
 
         if (result != CURLE_OK) {
             LOG(ERROR) << curl_easy_strerror(result) << ": " << url;
-        } else {
-            curl_easy_cleanup(curl);
         }
+        
+        curl_easy_cleanup(curl);
     } else {
         LOG(ERROR) << "curl_easy_init() returned nullptr: " << url;
     }

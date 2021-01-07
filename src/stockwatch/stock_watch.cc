@@ -6,6 +6,7 @@
 #include "glog/logging.h"
 #include "rapidjson/error/en.h"
 
+#include "stockwatch/util/curl/email.h"
 #include "stockwatch/util/io/io.h"
 #include "stockwatch/util/json/json.h"
 #include "stockwatch/util/time/time.h"
@@ -46,6 +47,8 @@ void StockWatch::Init() {
     LOG_IF(FATAL, securities.HasParseError())
         << "JSON parse error: " << rapidjson::GetParseError_En(securities.GetParseError()) << " "
         << util::json::ToString(securities);
+
+    DCHECK(securities.IsArray()) << util::json::ToString(securities);
 
     for (const auto& security : securities.GetArray()) {
         if (ShouldProcess(security)) {
@@ -157,6 +160,12 @@ void StockWatch::LogResults() const {
         std::string symbol = row.at("symbol").as<std::string>();
         LOG(INFO) << symbol << ": (https://finance.yahoo.com/chart/" << symbol << "/#ey)";
     }
+
+    // std::vector<std::string> cc = {"jmolloy19@gmail.com"};
+    util::curl::Email email("stockwatchresults@gmail.com", "stockwatchresults@gmail.com",
+                            config_.EmailPassword(), "smtps://smtp.gmail.com:465", "Daily Watch", "Test");
+
+    email.Send();
 }
 
 }  // namespace stockwatch

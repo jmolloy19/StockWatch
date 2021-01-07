@@ -24,13 +24,14 @@ Email::Email(const std::string& to, const std::string& from, const std::string& 
 }
 
 void Email::Send() const {
-    std::string_view contents = payload_text_;
+    std::string_view payload = payload_text_;
 
     CURL* curl = curl_easy_init();
 
     if (curl != nullptr) {
         curl_easy_setopt(curl, CURLOPT_URL, smtp_url_.c_str());
-
+        curl_easy_setopt(curl, CURLOPT_USERNAME, from_.c_str());
+        curl_easy_setopt(curl, CURLOPT_PASSWORD, password_.c_str());
         curl_easy_setopt(curl, CURLOPT_MAIL_FROM, from_.c_str());
 
         struct curl_slist* recipients = nullptr;
@@ -38,11 +39,13 @@ void Email::Send() const {
         for (const auto& cc_recipient : cc_) {
             recipients = curl_slist_append(recipients, cc_recipient.c_str());
         }
-        curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
 
+        curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
         curl_easy_setopt(curl, CURLOPT_READFUNCTION, Callback);
-        curl_easy_setopt(curl, CURLOPT_READDATA, &contents);
+        curl_easy_setopt(curl, CURLOPT_READDATA, &payload);
         curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
+        curl_easy_setopt(curl, CURLOPT_USE_SSL, CURLUSESSL_ALL);
+        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
 
         CURLcode result = curl_easy_perform(curl);
 
@@ -61,43 +64,34 @@ size_t Email::Callback(void* ptr, size_t size, size_t nmemb, void* userp) {
     std::string_view* email_text = reinterpret_cast<std::string_view*>(userp);
 
     try {
-        email_text->copy(reinterpret_cast<char*>(ptr), size * nmemb);
+        if (size * nmemb == 0 or email_text->size() == 0) {
+            return 0;
+        }
+
+        if (size * nmemb >= email_text->size()) {
+            size_t bytes_read = email_text->copy(reinterpret_cast<char*>(ptr), email_text->size());
+            *email_text = std::string_view();
+            return bytes_read;
+        }
+
+        return 0;
+        // email_text->copy(reinterpret_cast<char*>(ptr), size * nmemb);
+        // *email_text = email_text->substr(size * nmemb);
+
+        // return size * nmemb;
+
     } catch (const std::exception& e) {
         LOG(ERROR) << e.what();
         return 0;
     }
-
-    *email_text = email_text->substr(size * nmemb);
-
-    return size * nmemb;
 }
 
 void Email::InitPayloadText() {
     payload_text_.clear();
-    payload_text_.append("Date: " + time::CurrentLocalTime() + "\r\n");
-    payload_text_.append("To: " + to_ + "\r\n");
-    payload_text_.append("From: " + from_ + "\r\n");
-
-    if (not cc_.empty()) {
-        payload_text_.append("Cc: ");
-        for (const auto& cc_recipient : cc_) {
-            payload_text_.append(cc_recipient + (cc_recipient == cc_.back() ? "\r\n" : ", "));
-        }
-    }
-    // payload_text_.append("Message ID: " + username_ + "> \r\n");
     payload_text_.append("Subject: " + subject_ + "\r\n");
+    payload_text_.append("Date: " + time::CurrentLocalTime() + "\r\n");
     payload_text_.append("\r\n");
-    payload_text_.append("Body: ");
-
-    constexpr size_t kMaxLineLength = 78;
-    size_t bytes_written = 0;
-
-    while (bytes_written < body_.size()) {
-        size_t line_size = std::min(body_.size() - bytes_written, kMaxLineLength);
-
-        payload_text_.append(body_.substr(bytes_written, bytes_written + line_size) + "\r\n");
-        bytes_written += line_size;
-    }
+    payload_text_.append(body_ + "\r\n");
 }
 
 }  // namespace curl
